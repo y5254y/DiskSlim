@@ -1,0 +1,78 @@
+## .NET / C# 构建产物
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio
+.vs/
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+*.resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.idea/
+
+## JetBrains Rider
+*.sln.iml
+*.iml
+
+## 发布/打包产物
+[Pp]ublish/
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxsym
+*.msix
+*.msixbundle
+*.msixupload
+*.cer
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/[Pp]ackages/build/
+*.nuspec
+
+## 日志和临时文件
+*.log
+*.tmp
+*.temp
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## 测试结果
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## 密钥/证书（不要提交！）
+*.pfx
+*.p12
+*.key
+*.pem
+
+## 本地环境配置
+local.settings.json
+appsettings.local.json
+
+## SQLite 数据库（运行时生成）
+*.db
+*.sqlite
+*.sqlite3
+
+## Rider/其他 IDE 配置
+*.DotSettings
+nbproject/private/

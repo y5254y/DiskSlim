@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="DiskSlim.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DiskSlim"
+    xmlns:converters="using:DiskSlim.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- 全局值转换器 -->
+            <converters:FileSizeConverter x:Key="FileSizeConverter"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:SafetyLevelToBackgroundConverter x:Key="SafetyLevelToBackgroundConverter"/>
+            <converters:BoolToFolderIconConverter x:Key="BoolToFolderIconConverter"/>
+            <converters:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter"/>
+            <converters:NullToInvisibilityConverter x:Key="NullToInvisibilityConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

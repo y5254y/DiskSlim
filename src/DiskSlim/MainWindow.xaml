@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="DiskSlim.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DiskSlim"
+    xmlns:views="using:DiskSlim.Views"
+    Title="DiskSlim - C盘瘦身大师">
+
+    <Grid>
+        <NavigationView
+            x:Name="NavView"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            SelectionChanged="NavView_SelectionChanged"
+            OpenPaneLength="220">
+
+            <!-- 顶部标题区域 -->
+            <NavigationView.Header>
+                <Grid Padding="0,4,0,0">
+                    <TextBlock
+                        x:Name="PageTitle"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        Text="空间分析" />
+                </Grid>
+            </NavigationView.Header>
+
+            <!-- 导航菜单项 -->
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    x:Name="NavDashboard"
+                    Content="空间分析"
+                    Tag="Dashboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    x:Name="NavCleanup"
+                    Content="智能清理"
+                    Tag="Cleanup">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE74D;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    x:Name="NavMigration"
+                    Content="文件夹迁移"
+                    Tag="Migration">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8B7;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    x:Name="NavSoftwareMove"
+                    Content="软件搬家"
+                    Tag="SoftwareMove">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <!-- 底部操作项（主题切换） -->
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem
+                    x:Name="NavThemeToggle"
+                    Content="切换主题"
+                    Tag="ThemeToggle"
+                    SelectsOnInvoked="False"
+                    Tapped="ThemeToggle_Tapped">
+                    <NavigationViewItem.Icon>
+                        <FontIcon x:Name="ThemeIcon" Glyph="&#xE793;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <!-- 页面内容区域 -->
+            <Frame x:Name="ContentFrame" Margin="0,-44,0,0" />
+        </NavigationView>
+    </Grid>
+</Window>

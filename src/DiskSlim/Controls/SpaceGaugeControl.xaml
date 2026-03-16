@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="DiskSlim.Controls.SpaceGaugeControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Width="{x:Bind Width}" Height="{x:Bind Height}">
+        <!-- 外圈背景（灰色轨道） -->
+        <Ellipse
+            Width="{x:Bind Width}"
+            Height="{x:Bind Height}"
+            Stroke="{ThemeResource CardStrokeColorDefaultBrush}"
+            StrokeThickness="14"
+            Fill="Transparent"/>
+
+        <!-- 用量弧形（Canvas 自绘） -->
+        <Canvas x:Name="GaugeCanvas"
+                Width="{x:Bind Width}"
+                Height="{x:Bind Height}"/>
+
+        <!-- 中心文字 -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock
+                x:Name="PercentText"
+                Text="{x:Bind UsageText, Mode=OneWay}"
+                FontSize="28"
+                FontWeight="Bold"
+                HorizontalAlignment="Center"/>
+            <TextBlock
+                Text="已使用"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
