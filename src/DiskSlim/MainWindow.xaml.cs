@@ -59,6 +59,7 @@ public sealed partial class MainWindow : Window
                 "Cleanup" => typeof(CleanupPage),
                 "Migration" => typeof(MigrationPage),
                 "SoftwareMove" => typeof(SoftwareMovePage),
+                "CleanupReport" => typeof(CleanupReportPage),
                 _ => null
             };
 

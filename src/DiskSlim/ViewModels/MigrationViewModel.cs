@@ -21,13 +21,16 @@ public partial class MigrationViewModel : ObservableObject
     // ===== 迁移历史 =====
     public ObservableCollection<MigrationTask> MigrationHistory { get; } = new();
 
+    // ===== 可选目标盘符列表（扫描系统中实际存在的非系统盘）=====
+    public ObservableCollection<string> AvailableDrives { get; } = new();
+
     // ===== 当前选择 =====
 
     [ObservableProperty]
     private UserFolderInfo? _selectedFolder;
 
     [ObservableProperty]
-    private string _destinationDrive = "D:";
+    private string _destinationDrive = string.Empty;
 
     [ObservableProperty]
     private string _destinationPath = string.Empty;
@@ -36,6 +39,9 @@ public partial class MigrationViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isMigrating;
+
+    [ObservableProperty]
+    private bool _isLoadingFolders;
 
     [ObservableProperty]
     private double _migrationProgress;
@@ -55,11 +61,36 @@ public partial class MigrationViewModel : ObservableObject
     public MigrationViewModel(IMigrationService migrationService)
     {
         _migrationService = migrationService;
+        LoadDrives();
         LoadFolders();
     }
 
     /// <summary>
-    /// 加载可迁移文件夹列表
+    /// 扫描系统中可用的非系统盘盘符
+    /// </summary>
+    private void LoadDrives()
+    {
+        AvailableDrives.Clear();
+        try
+        {
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                // 只显示固定盘，且不是系统盘（C:）
+                if (drive.DriveType == DriveType.Fixed &&
+                    !drive.Name.StartsWith("C", StringComparison.OrdinalIgnoreCase))
+                {
+                    AvailableDrives.Add(drive.Name.TrimEnd('\\'));
+                }
+            }
+        }
+        catch { }
+
+        // 如有可用盘，默认选第一个；否则预填 D:
+        DestinationDrive = AvailableDrives.Count > 0 ? AvailableDrives[0] : "D:";
+    }
+
+    /// <summary>
+    /// 加载可迁移文件夹列表（并异步扫描各文件夹大小）
     /// </summary>
     private void LoadFolders()
     {
@@ -67,6 +98,56 @@ public partial class MigrationViewModel : ObservableObject
         MigratableFolders.Clear();
         foreach (var folder in folders)
             MigratableFolders.Add(folder);
+
+        // 异步扫描文件夹大小（不阻塞 UI）
+        _ = ScanFolderSizesAsync();
+    }
+
+    /// <summary>
+    /// 在后台异步扫描各文件夹大小
+    /// </summary>
+    private async Task ScanFolderSizesAsync()
+    {
+        IsLoadingFolders = true;
+        try
+        {
+            // 并行扫描以加快速度
+            var tasks = MigratableFolders.Select(async folder =>
+            {
+                try
+                {
+                    folder.SizeBytes = await GetFolderSizeAsync(folder.CurrentPath);
+                }
+                catch { folder.SizeBytes = 0; }
+                // 触发 UI 刷新（手动通知，因 UserFolderInfo 不是 ObservableObject）
+                OnPropertyChanged(nameof(MigratableFolders));
+            });
+            await Task.WhenAll(tasks);
+        }
+        finally
+        {
+            IsLoadingFolders = false;
+        }
+    }
+
+    /// <summary>
+    /// 递归统计文件夹大小
+    /// </summary>
+    private static Task<long> GetFolderSizeAsync(string path)
+    {
+        return Task.Run(() =>
+        {
+            long size = 0;
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                {
+                    try { size += new FileInfo(file).Length; } catch { }
+                }
+            }
+            catch { }
+            return size;
+        });
     }
 
     /// <summary>
@@ -78,6 +159,22 @@ public partial class MigrationViewModel : ObservableObject
         if (SelectedFolder == null) return;
 
         HasSpaceError = false;
+
+        if (string.IsNullOrEmpty(DestinationDrive))
+        {
+            HasSpaceError = true;
+            SpaceErrorMessage = "请先选择目标盘符";
+            return;
+        }
+
+        // 检查目标盘是否存在
+        if (!DriveInfo.GetDrives().Any(d => d.Name.StartsWith(DestinationDrive, StringComparison.OrdinalIgnoreCase)))
+        {
+            HasSpaceError = true;
+            SpaceErrorMessage = $"目标盘 {DestinationDrive} 不存在，请选择其他盘符";
+            return;
+        }
+
         bool hasSpace = await _migrationService.ValidateDestinationSpaceAsync(
             SelectedFolder.CurrentPath, DestinationDrive);
 
@@ -95,10 +192,22 @@ public partial class MigrationViewModel : ObservableObject
     private async Task MigrateAsync()
     {
         if (SelectedFolder == null || IsMigrating) return;
+
+        if (string.IsNullOrEmpty(DestinationDrive))
+        {
+            StatusMessage = "请先选择目标盘符";
+            return;
+        }
+
         if (string.IsNullOrEmpty(DestinationPath))
         {
-            DestinationPath = Path.Combine(DestinationDrive, Path.GetFileName(SelectedFolder.CurrentPath));
+            DestinationPath = Path.Combine(DestinationDrive + "\\",
+                Path.GetFileName(SelectedFolder.CurrentPath));
         }
+
+        // 迁移前验证空间
+        await ValidateSpaceAsync();
+        if (HasSpaceError) return;
 
         IsMigrating = true;
         MigrationProgress = 0;
@@ -125,6 +234,7 @@ public partial class MigrationViewModel : ObservableObject
             MigrationProgress = 100;
             StatusMessage = $"迁移完成！{SelectedFolder.DisplayName} 已迁移到 {DestinationPath}";
             MigrationHistory.Insert(0, task);
+            DestinationPath = string.Empty; // 清空路径，供下次使用
             LoadFolders(); // 刷新状态
         }
         catch (OperationCanceledException)

@@ -1,6 +1,7 @@
 using DiskSlim.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace DiskSlim.Views;
 
@@ -15,5 +16,12 @@ public sealed partial class CleanupPage : Page
     {
         this.InitializeComponent();
         ViewModel = App.Services.GetRequiredService<CleanupViewModel>();
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        // 将 XamlRoot 传递给 ViewModel，以便弹出确认对话框
+        ViewModel.XamlRoot = this.XamlRoot;
     }
 }

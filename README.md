@@ -59,9 +59,17 @@ repartitioning or system reinstallation.
 | 回收站 | 已删除文件 | 🟢 安全 |
 | 错误报告 | .dmp/.wer 文件 | 🟢 安全 |
 | 缩略图缓存 | 资源管理器缩略图 | 🟢 安全 |
+| 浏览器缓存 | Edge/Chrome/Firefox 缓存 | 🟡 谨慎 |
+| 开发工具缓存 | npm/pip/NuGet/Maven/Gradle | 🟡 谨慎 |
+| 通讯软件缓存 | 微信/QQ/钉钉/Teams | 🟡 谨慎 |
 | Windows Update 残留 | 更新下载缓存 | 🟡 谨慎 |
-| 浏览器缓存 | Edge/Chrome 缓存 | 🟡 谨慎 |
+| Windows.old | 旧版 Windows 系统文件 | 🟡 谨慎 |
 | 休眠文件 | hiberfil.sys | 🔴 危险 |
+
+### 📋 清理历史报告 / Cleanup History
+- 每次清理后自动生成报告（清理项目、释放空间、耗时）
+- 应用内查看历史清理记录
+- 支持导出为 TXT 或 HTML 文件
 
 ### 📂 文件夹迁移 / Folder Migration
 将用户文件夹（桌面/文档/下载/图片/视频/音乐）迁移到其他磁盘，通过符号链接保持原路径透明可用
@@ -135,12 +143,12 @@ dotnet build src/DiskSlim/DiskSlim.csproj -c Debug -r win-x64
 - [x] 空间仪表盘环形图控件
 - [x] 深色/浅色主题切换
 
-### Phase 2 — 增强版
-- [ ] 大文件 Treemap 可视化
-- [ ] 软件缓存深度清理（微信/Steam/npm）
-- [ ] 清理历史记录
-- [ ] 多磁盘概览仪表盘
-- [ ] 国际化（中/英文切换）
+### Phase 2 — 增强版 ✅
+- [x] 软件缓存深度清理（浏览器 Chrome/Edge/Firefox、开发工具 npm/pip/NuGet/Maven/Gradle、通讯软件微信/QQ/钉钉/Teams）
+- [x] Windows Update 残留清理（SoftwareDistribution\Download、Windows.old）
+- [x] 用户文件夹迁移功能完善（自动检测可用盘符、扫描文件夹大小、迁移验证）
+- [x] 安全等级标注系统完善（🟡/🔴级别清理弹出确认对话框）
+- [x] 清理详情报告（历史记录、导出 TXT/HTML）
 
 ### Phase 3 — Pro 版
 - [ ] 历史快照与空间趋势分析

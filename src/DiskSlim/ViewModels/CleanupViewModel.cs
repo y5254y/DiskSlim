@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using DiskSlim.Helpers;
 using DiskSlim.Models;
 using DiskSlim.Services;
+using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 
 namespace DiskSlim.ViewModels;
@@ -13,6 +14,7 @@ namespace DiskSlim.ViewModels;
 public partial class CleanupViewModel : ObservableObject
 {
     private readonly ICleanupService _cleanupService;
+    private readonly ICleanupReportService _reportService;
     private CancellationTokenSource? _cts;
 
     // ===== 清理项目列表 =====
@@ -52,9 +54,14 @@ public partial class CleanupViewModel : ObservableObject
     [ObservableProperty]
     private bool _showSafeOnly = true;
 
-    public CleanupViewModel(ICleanupService cleanupService)
+    // ===== UI 引用（用于弹出确认对话框）=====
+    /// <summary>页面中的 XamlRoot，由 View 代码层设置</summary>
+    public Microsoft.UI.Xaml.XamlRoot? XamlRoot { get; set; }
+
+    public CleanupViewModel(ICleanupService cleanupService, ICleanupReportService reportService)
     {
         _cleanupService = cleanupService;
+        _reportService = reportService;
         LoadCleanupItems();
     }
 
@@ -116,7 +123,7 @@ public partial class CleanupViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 执行清理操作
+    /// 执行清理操作，针对🟡和🔴级别项目弹出确认对话框
     /// </summary>
     [RelayCommand]
     private async Task CleanAsync()
@@ -130,10 +137,26 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
 
+        // 检查是否包含🟡或🔴级别项目，需要确认
+        var cautionItems = selectedItems.Where(i => i.Safety == SafetyLevel.Caution).ToList();
+        var dangerItems = selectedItems.Where(i => i.Safety == SafetyLevel.Danger).ToList();
+
+        if ((cautionItems.Count > 0 || dangerItems.Count > 0) && XamlRoot != null)
+        {
+            bool confirmed = await ShowConfirmationDialogAsync(cautionItems, dangerItems);
+            if (!confirmed)
+            {
+                StatusMessage = "清理已取消";
+                return;
+            }
+        }
+
         IsCleaning = true;
         CleanProgress = 0;
         StatusMessage = "正在清理...";
         _cts = new CancellationTokenSource();
+
+        var report = new CleanupReport { StartedAt = DateTime.Now };
 
         try
         {
@@ -145,11 +168,46 @@ public partial class CleanupViewModel : ObservableObject
                 StatusMessage = $"正在清理：{p.CurrentItemName}";
             });
 
-            long freed = await _cleanupService.CleanAsync(selectedItems, progress, _cts.Token);
-            TotalCleanedSize = freed;
-            TotalCleanedSizeText = FileSizeHelper.Format(freed);
+            // 逐项清理并记录明细
+            long totalFreed = 0;
+            int completed = 0;
+            foreach (var item in selectedItems)
+            {
+                if (_cts.Token.IsCancellationRequested) break;
+                if (item.CleanAction == null) continue;
+
+                var reportItem = new CleanupReportItem { Name = item.Name };
+                try
+                {
+                    var itemProgress = new Progress<long>(bytes =>
+                    {
+                        progress.Report(new CleanupProgress(item.Name, totalFreed + bytes, completed, selectedItems.Count));
+                    });
+                    long freed = await item.CleanAction(itemProgress, _cts.Token);
+                    reportItem.FreedBytes = freed;
+                    reportItem.Success = true;
+                    totalFreed += freed;
+                    item.IsCleaned = true;
+                }
+                catch (OperationCanceledException) { throw; }
+                catch (Exception ex)
+                {
+                    reportItem.Success = false;
+                    reportItem.ErrorMessage = ex.Message;
+                }
+                report.Items.Add(reportItem);
+                completed++;
+            }
+
+            TotalCleanedSize = totalFreed;
+            TotalCleanedSizeText = FileSizeHelper.Format(totalFreed);
             CleanProgress = 100;
             StatusMessage = $"清理完成！共释放 {TotalCleanedSizeText}";
+
+            // 保存清理报告
+            report.CompletedAt = DateTime.Now;
+            report.TotalFreedBytes = totalFreed;
+            try { await _reportService.SaveReportAsync(report); } catch { /* 报告保存失败不影响主流程 */ }
         }
         catch (OperationCanceledException)
         {
@@ -192,5 +250,45 @@ public partial class CleanupViewModel : ObservableObject
     {
         TotalSelectedSize = CleanupItems.Where(i => i.IsSelected).Sum(i => i.EstimatedSize);
         TotalSelectedSizeText = FileSizeHelper.Format(TotalSelectedSize);
+    }
+
+    /// <summary>
+    /// 弹出确认对话框，提示用户所选的🟡/🔴级别风险
+    /// </summary>
+    private async Task<bool> ShowConfirmationDialogAsync(
+        List<CleanupItem> cautionItems,
+        List<CleanupItem> dangerItems)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("您选中了以下需要注意的清理项目，请确认：");
+        sb.AppendLine();
+
+        if (dangerItems.Count > 0)
+        {
+            sb.AppendLine("🔴 危险项目（操作不可逆，请慎重）：");
+            foreach (var item in dangerItems)
+                sb.AppendLine($"  • {item.Name}");
+            sb.AppendLine();
+        }
+
+        if (cautionItems.Count > 0)
+        {
+            sb.AppendLine("🟡 谨慎项目（建议确认后清理）：");
+            foreach (var item in cautionItems)
+                sb.AppendLine($"  • {item.Name}");
+        }
+
+        var dialog = new ContentDialog
+        {
+            Title = "确认清理",
+            Content = sb.ToString().Trim(),
+            PrimaryButtonText = "确认清理",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        return result == ContentDialogResult.Primary;
     }
 }

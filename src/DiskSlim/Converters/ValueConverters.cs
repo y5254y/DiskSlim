@@ -118,3 +118,47 @@ public class NullToInvisibilityConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, string language)
         => throw new NotImplementedException();
 }
+
+/// <summary>
+/// null → Visible，非 null → Collapsed（用于"未选中"占位显示）
+/// </summary>
+public class NullToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+        => value == null ? Visibility.Visible : Visibility.Collapsed;
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+        => throw new NotImplementedException();
+}
+
+/// <summary>
+/// bool → 成功/失败图标字形（✓/✗）
+/// </summary>
+public class BoolToSuccessIconConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+        => value is bool b && b ? "\uE73E" : "\uE711"; // 对勾 / X号
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+        => throw new NotImplementedException();
+}
+
+/// <summary>
+/// bool → 成功/失败颜色（绿色/红色）
+/// </summary>
+public class BoolToSuccessColorConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is bool b)
+        {
+            return b
+                ? new SolidColorBrush(Color.FromArgb(255, 23, 195, 70))  // 绿色
+                : new SolidColorBrush(Color.FromArgb(255, 232, 77, 80)); // 红色
+        }
+        return new SolidColorBrush(Colors.Transparent);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+        => throw new NotImplementedException();
+}

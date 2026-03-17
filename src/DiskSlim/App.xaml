@@ -20,6 +20,9 @@
             <converters:BoolToFolderIconConverter x:Key="BoolToFolderIconConverter"/>
             <converters:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter"/>
             <converters:NullToInvisibilityConverter x:Key="NullToInvisibilityConverter"/>
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            <converters:BoolToSuccessIconConverter x:Key="BoolToSuccessIconConverter"/>
+            <converters:BoolToSuccessColorConverter x:Key="BoolToSuccessColorConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

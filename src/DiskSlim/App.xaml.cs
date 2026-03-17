@@ -39,6 +39,7 @@ public partial class App : Application
         services.AddSingleton<IMigrationService, MigrationService>();
         services.AddSingleton<ISymlinkService, SymlinkService>();
         services.AddSingleton<ISoftwareScanService, SoftwareScanService>();
+        services.AddSingleton<ICleanupReportService, CleanupReportService>();
 
         // 注册 ViewModel
         services.AddTransient<MainViewModel>();
@@ -46,6 +47,7 @@ public partial class App : Application
         services.AddTransient<CleanupViewModel>();
         services.AddTransient<MigrationViewModel>();
         services.AddTransient<SoftwareMoveViewModel>();
+        services.AddTransient<CleanupReportViewModel>();
 
         return services.BuildServiceProvider();
     }
@@ -53,8 +55,12 @@ public partial class App : Application
     /// <summary>
     /// 应用程序启动时调用，创建并显示主窗口
     /// </summary>
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
+        // 初始化清理报告数据库
+        var reportService = Services.GetRequiredService<ICleanupReportService>();
+        await reportService.InitializeAsync();
+
         MainWindow = new MainWindow();
         MainWindow.Activate();
     }

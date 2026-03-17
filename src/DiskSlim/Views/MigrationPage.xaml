@@ -28,6 +28,17 @@
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        Padding="24,16"/>
 
+            <!-- 文件夹大小扫描中提示 -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                        Padding="24,16"
+                        Visibility="{x:Bind ViewModel.IsLoadingFolders, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ProgressRing Width="14" Height="14" IsActive="True"/>
+                <TextBlock Text="正在计算文件夹大小..."
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+
             <ListView
                 Grid.Row="1"
                 Padding="24,0"
@@ -91,12 +102,8 @@
                 <TextBlock Text="目标盘符" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                 <ComboBox
                     HorizontalAlignment="Stretch"
-                    SelectedValue="{x:Bind ViewModel.DestinationDrive, Mode=TwoWay}">
-                    <ComboBoxItem Content="D:" Tag="D:"/>
-                    <ComboBoxItem Content="E:" Tag="E:"/>
-                    <ComboBoxItem Content="F:" Tag="F:"/>
-                    <ComboBoxItem Content="G:" Tag="G:"/>
-                </ComboBox>
+                    ItemsSource="{x:Bind ViewModel.AvailableDrives, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.DestinationDrive, Mode=TwoWay}"/>
             </StackPanel>
 
             <!-- 空间不足警告 -->
