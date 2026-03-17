@@ -41,7 +41,7 @@ public partial class CleanupViewModel : ObservableObject
     private bool _isCleaning;
 
     [ObservableProperty]
-    private string _statusMessage = "点击"扫描"查看可清理项目";
+    private string _statusMessage = @"点击""扫描""查看可清理项目";
 
     [ObservableProperty]
     private double _cleanProgress;
@@ -63,10 +63,24 @@ public partial class CleanupViewModel : ObservableObject
     /// </summary>
     private void LoadCleanupItems()
     {
+        foreach (var existingItem in CleanupItems)
+            existingItem.PropertyChanged -= CleanupItem_PropertyChanged;
+
         var items = _cleanupService.GetCleanupItems();
         CleanupItems.Clear();
         foreach (var item in items)
+        {
+            item.PropertyChanged += CleanupItem_PropertyChanged;
             CleanupItems.Add(item);
+        }
+
+        UpdateTotalSelectedSize();
+    }
+
+    private void CleanupItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(CleanupItem.IsSelected) or nameof(CleanupItem.EstimatedSize))
+            UpdateTotalSelectedSize();
     }
 
     /// <summary>

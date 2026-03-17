@@ -20,10 +20,10 @@ public static class FileSizeHelper
     {
         if (bytes < 0) return "0 B";
         if (bytes < KB) return $"{bytes} B";
-        if (bytes < MB) return $"{(double)bytes / KB:F{decimals}} KB";
-        if (bytes < GB) return $"{(double)bytes / MB:F{decimals}} MB";
-        if (bytes < TB) return $"{(double)bytes / GB:F{decimals}} GB";
-        return $"{(double)bytes / TB:F{decimals}} TB";
+        if (bytes < MB) return $"{((double)bytes / KB).ToString($"F{decimals}")} KB";
+        if (bytes < GB) return $"{((double)bytes / MB).ToString($"F{decimals}")} MB";
+        if (bytes < TB) return $"{((double)bytes / GB).ToString($"F{decimals}")} GB";
+        return $"{((double)bytes / TB).ToString($"F{decimals}")} TB";
     }
 
     /// <summary>

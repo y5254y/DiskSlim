@@ -43,7 +43,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
     private bool _isMoving;
 
     [ObservableProperty]
-    private string _statusMessage = "点击"扫描软件"加载已安装软件列表";
+    private string _statusMessage = @"点击""扫描软件""加载已安装软件列表";
 
     [ObservableProperty]
     private int _systemDriveSoftwareCount;

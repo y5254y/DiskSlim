@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "DiskSlim (MSIX)": {
+      "commandName": "MsixPackage"
+    }
+  }
+}

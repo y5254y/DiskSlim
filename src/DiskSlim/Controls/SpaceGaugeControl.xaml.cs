@@ -3,9 +3,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
-using System.Numerics;
+
 using Windows.Foundation;
 using Windows.UI;
+using PathControl = Microsoft.UI.Xaml.Shapes.Path;
 
 namespace DiskSlim.Controls;
 
@@ -101,7 +102,7 @@ public sealed partial class SpaceGaugeControl : UserControl
                 ? Color.FromArgb(255, 255, 168, 0) // 黄色
                 : Color.FromArgb(255, 0, 120, 212); // 蓝色（Fluent accent）
 
-        var arcPath = new Path
+        var arcPath = new PathControl
         {
             Stroke = new SolidColorBrush(arcColor),
             StrokeThickness = strokeWidth,
