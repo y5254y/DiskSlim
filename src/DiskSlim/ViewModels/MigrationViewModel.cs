@@ -83,9 +83,7 @@ public partial class MigrationViewModel : ObservableObject
                 }
             }
         }
-        catch { }
-
-        // 如有可用盘，默认选第一个；否则预填 D:
+        catch { } // 忽略磁盘枚举错误（如权限问题），使用预填的默认盘符 D:
         DestinationDrive = AvailableDrives.Count > 0 ? AvailableDrives[0] : "D:";
     }
 
@@ -111,16 +109,15 @@ public partial class MigrationViewModel : ObservableObject
         IsLoadingFolders = true;
         try
         {
-            // 并行扫描以加快速度
+            // 并行扫描以加快速度，UserFolderInfo 实现了 INotifyPropertyChanged，
+            // SizeBytes 属性变更会自动通知 UI 刷新
             var tasks = MigratableFolders.Select(async folder =>
             {
                 try
                 {
                     folder.SizeBytes = await GetFolderSizeAsync(folder.CurrentPath);
                 }
-                catch { folder.SizeBytes = 0; }
-                // 触发 UI 刷新（手动通知，因 UserFolderInfo 不是 ObservableObject）
-                OnPropertyChanged(nameof(MigratableFolders));
+                catch { folder.SizeBytes = 0; } // 访问被拒绝时将大小设为0，不影响其他文件夹扫描
             });
             await Task.WhenAll(tasks);
         }
@@ -142,10 +139,10 @@ public partial class MigrationViewModel : ObservableObject
             {
                 foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
                 {
-                    try { size += new FileInfo(file).Length; } catch { }
+                    try { size += new FileInfo(file).Length; } catch { } // 忽略单个文件读取错误（如访问拒绝）
                 }
             }
-            catch { }
+            catch { } // 忽略目录枚举错误，返回已统计的部分大小
             return size;
         });
     }
@@ -201,7 +198,7 @@ public partial class MigrationViewModel : ObservableObject
 
         if (string.IsNullOrEmpty(DestinationPath))
         {
-            DestinationPath = Path.Combine(DestinationDrive + "\\",
+            DestinationPath = Path.Combine(DestinationDrive,
                 Path.GetFileName(SelectedFolder.CurrentPath));
         }
 

@@ -204,10 +204,14 @@ public partial class CleanupViewModel : ObservableObject
             CleanProgress = 100;
             StatusMessage = $"清理完成！共释放 {TotalCleanedSizeText}";
 
-            // 保存清理报告
-            report.CompletedAt = DateTime.Now;
-            report.TotalFreedBytes = totalFreed;
-            try { await _reportService.SaveReportAsync(report); } catch { /* 报告保存失败不影响主流程 */ }
+            // 仅在至少清理了一项时保存报告
+            if (report.Items.Count > 0)
+            {
+                report.CompletedAt = DateTime.Now;
+                report.TotalFreedBytes = totalFreed;
+                try { await _reportService.SaveReportAsync(report); }
+                catch { /* 报告保存失败不影响主清理流程，用户仍看到清理完成提示 */ }
+            }
         }
         catch (OperationCanceledException)
         {

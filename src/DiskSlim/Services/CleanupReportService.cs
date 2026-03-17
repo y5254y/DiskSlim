@@ -114,12 +114,13 @@ public class CleanupReportService : ICleanupReportService
         // 读取报告主记录
         var reports = new List<CleanupReport>();
         var cmd = conn.CreateCommand();
-        cmd.CommandText = $"""
+        cmd.CommandText = """
             SELECT Id, StartedAt, CompletedAt, TotalFreedBytes
             FROM CleanupReports
             ORDER BY Id DESC
-            LIMIT {limit};
+            LIMIT $limit;
             """;
+        cmd.Parameters.AddWithValue("$limit", limit);
 
         await using (var reader = await cmd.ExecuteReaderAsync())
         {

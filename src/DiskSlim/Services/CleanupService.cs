@@ -380,13 +380,13 @@ public class CleanupService : ICleanupService
                     freed += size;
                     progress?.Report(freed);
                 }
-                catch { }
+                catch { } // 忽略单个文件的访问拒绝/占用错误，继续处理其他文件
             }
 
             // 清空空文件夹
             foreach (var dir in Directory.EnumerateDirectories(folderPath, "*", SearchOption.AllDirectories).Reverse())
             {
-                try { Directory.Delete(dir); } catch { }
+                try { Directory.Delete(dir); } catch { } // 忽略非空目录或访问拒绝错误
             }
 
             return freed;
@@ -556,9 +556,9 @@ public class CleanupService : ICleanupService
             foreach (var d in Directory.GetDirectories(baseDir, "Profile *"))
                 subDirs.Add(Path.GetFileName(d));
         }
-        catch { }
+        catch { } // 目录枚举失败时使用默认列表（仅 Default 配置文件）
 
-        string[] cacheSubDirs = { "Cache", "Code Cache", "GPUCache", "Service Worker\\CacheStorage" };
+        string[] cacheSubDirs = { "Cache", "Code Cache", "GPUCache", Path.Combine("Service Worker", "CacheStorage") };
         foreach (var profile in subDirs)
         {
             foreach (var sub in cacheSubDirs)

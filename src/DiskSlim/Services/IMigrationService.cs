@@ -40,9 +40,9 @@ public interface IMigrationService
 }
 
 /// <summary>
-/// 用户文件夹信息（可迁移的特殊文件夹）
+/// 用户文件夹信息（可迁移的特殊文件夹），支持属性变更通知以便 UI 实时更新
 /// </summary>
-public class UserFolderInfo
+public class UserFolderInfo : System.ComponentModel.INotifyPropertyChanged
 {
     /// <summary>文件夹显示名称（如"文档"）</summary>
     public string DisplayName { get; set; } = string.Empty;
@@ -59,8 +59,22 @@ public class UserFolderInfo
     /// <summary>文件夹图标字形</summary>
     public string IconGlyph { get; set; } = "\uE8B7";
 
-    /// <summary>当前大小（字节），扫描后填充</summary>
-    public long SizeBytes { get; set; }
+    private long _sizeBytes;
+    /// <summary>当前大小（字节），扫描后填充，变更时通知 UI</summary>
+    public long SizeBytes
+    {
+        get => _sizeBytes;
+        set
+        {
+            if (_sizeBytes != value)
+            {
+                _sizeBytes = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(SizeBytes)));
+            }
+        }
+    }
+
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
 }
 
 /// <summary>
