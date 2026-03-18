@@ -126,7 +126,7 @@ public class SnapshotService : ISnapshotService
             snapshots.Add(new DiskSnapshot
             {
                 Id = reader.GetInt32(0),
-                SnapshotTime = DateTime.Parse(reader.GetString(1)),
+                SnapshotTime = DateTime.Parse(reader.GetString(1), null, System.Globalization.DateTimeStyles.RoundtripKind),
                 Label = reader.GetString(2),
                 TotalBytes = reader.GetInt64(3),
                 UsedBytes = reader.GetInt64(4),
@@ -162,7 +162,7 @@ public class SnapshotService : ISnapshotService
                 snapshot = new DiskSnapshot
                 {
                     Id = reader.GetInt32(0),
-                    SnapshotTime = DateTime.Parse(reader.GetString(1)),
+                    SnapshotTime = DateTime.Parse(reader.GetString(1), null, System.Globalization.DateTimeStyles.RoundtripKind),
                     Label = reader.GetString(2),
                     TotalBytes = reader.GetInt64(3),
                     UsedBytes = reader.GetInt64(4),
@@ -327,7 +327,7 @@ public class SnapshotService : ISnapshotService
         {
             foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
             {
-                if (token.IsCancellationRequested) break;
+                token.ThrowIfCancellationRequested();
                 try
                 {
                     total += new FileInfo(file).Length;

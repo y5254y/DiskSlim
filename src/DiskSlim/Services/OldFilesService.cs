@@ -12,7 +12,7 @@ public class OldFilesService : IOldFilesService
     /// <summary>临时文件扩展名集合</summary>
     private static readonly HashSet<string> TempExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".tmp", ".temp", ".bak", ".old", ".log", ".cache", "~"
+        ".tmp", ".temp", ".bak", ".old", ".log", ".cache"
     };
 
     /// <summary>需要跳过的系统目录（避免误删系统文件）</summary>
@@ -189,8 +189,11 @@ public class OldFilesService : IOldFilesService
                     pFrom = filePath + "\0\0",
                     fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT
                 };
-                SHFileOperation(ref fileOp);
+                int result = SHFileOperation(ref fileOp);
+                if (result != 0)
+                    throw new IOException($"SHFileOperation 失败，错误码：{result}");
             }
+            catch (IOException) { throw; }
             catch { }
         });
     }

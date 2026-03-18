@@ -107,14 +107,24 @@ public class ScheduleService : IScheduleService
         if (proc.ExitCode != 0) return null;
 
         // 解析 schtasks CSV 输出：任务名,下次运行时间,状态
+        // CSV 字段可能含引号，逐字段解析第二列
         try
         {
-            var parts = output.Split(',');
-            if (parts.Length >= 2)
+            string trimmed = output.Trim();
+            if (trimmed.StartsWith('"'))
             {
-                string nextRun = parts[1].Trim('"', ' ');
-                if (DateTime.TryParse(nextRun, out var dt))
-                    return dt;
+                // 跳过第一个引号包围的字段（任务名），找到第二个字段
+                int closeQuote = trimmed.IndexOf('"', 1);
+                if (closeQuote >= 0 && closeQuote + 2 < trimmed.Length)
+                {
+                    string rest = trimmed[(closeQuote + 2)..]; // 跳过 ","
+                    string nextRun = rest.StartsWith('"')
+                        ? rest[1..rest.IndexOf('"', 1)]
+                        : rest.Split(',')[0];
+                    nextRun = nextRun.Trim();
+                    if (DateTime.TryParse(nextRun, out var dt))
+                        return dt;
+                }
             }
         }
         catch { }
