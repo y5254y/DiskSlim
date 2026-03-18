@@ -160,7 +160,7 @@ public partial class CleanupViewModel : ObservableObject
 
         try
         {
-            var progress = new Progress<CleanupProgress>(p =>
+            IProgress<CleanupProgress> progress = new Progress<CleanupProgress>(p =>
             {
                 CurrentCleaningItem = p.CurrentItemName;
                 if (p.ItemsTotal > 0)

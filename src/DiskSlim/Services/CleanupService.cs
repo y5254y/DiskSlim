@@ -366,27 +366,89 @@ public class CleanupService : ICleanupService
     {
         return await Task.Run(() =>
         {
-            long freed = 0;
-            if (!Directory.Exists(folderPath)) return 0;
+            if (!Directory.Exists(folderPath))
+                return 0L;
 
-            foreach (var file in Directory.EnumerateFiles(folderPath, "*", SearchOption.AllDirectories))
+            long freed = 0;
+            var visitedDirs = new List<string>();
+            var pendingDirs = new Stack<string>();
+            pendingDirs.Push(folderPath);
+
+            while (pendingDirs.Count > 0)
             {
                 ct.ThrowIfCancellationRequested();
+
+                var currentDir = pendingDirs.Pop();
+                visitedDirs.Add(currentDir);
+
                 try
                 {
-                    var fi = new FileInfo(file);
-                    long size = fi.Length;
-                    fi.Delete();
-                    freed += size;
-                    progress?.Report(freed);
+                    foreach (var file in Directory.EnumerateFiles(currentDir))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        try
+                        {
+                            var fi = new FileInfo(file);
+                            if ((fi.Attributes & FileAttributes.ReparsePoint) != 0)
+                                continue;
+
+                            long size = fi.Length;
+                            fi.Attributes = FileAttributes.Normal;
+                            fi.Delete();
+                            freed += size;
+                            progress?.Report(freed);
+                        }
+                        catch
+                        {
+                            // 忽略单个文件的访问拒绝/占用错误，继续处理其他文件
+                        }
+                    }
                 }
-                catch { } // 忽略单个文件的访问拒绝/占用错误，继续处理其他文件
+                catch
+                {
+                    // 当前目录无法枚举文件时继续处理其他目录
+                }
+
+                try
+                {
+                    foreach (var subDir in Directory.EnumerateDirectories(currentDir))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        try
+                        {
+                            var attr = File.GetAttributes(subDir);
+                            if ((attr & FileAttributes.ReparsePoint) != 0)
+                                continue;
+
+                            pendingDirs.Push(subDir);
+                        }
+                        catch
+                        {
+                            // 子目录属性读取失败时跳过
+                        }
+                    }
+                }
+                catch
+                {
+                    // 当前目录无法枚举子目录时继续处理其他目录
+                }
             }
 
-            // 清空空文件夹
-            foreach (var dir in Directory.EnumerateDirectories(folderPath, "*", SearchOption.AllDirectories).Reverse())
+            // 反向删除空子目录（不删除根目录）
+            for (int i = visitedDirs.Count - 1; i >= 0; i--)
             {
-                try { Directory.Delete(dir); } catch { } // 忽略非空目录或访问拒绝错误
+                var dir = visitedDirs[i];
+                if (string.Equals(dir, folderPath, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                try
+                {
+                    Directory.Delete(dir, false);
+                }
+                catch
+                {
+                    // 忽略非空目录或访问拒绝错误
+                }
             }
 
             return freed;

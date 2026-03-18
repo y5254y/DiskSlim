@@ -227,37 +227,37 @@ public class CleanupReportService : ICleanupReportService
                 """);
         }
 
-        return $"""
+        return $$"""
             <!DOCTYPE html>
             <html lang="zh-CN">
             <head>
               <meta charset="UTF-8"/>
               <title>DiskSlim 清理报告</title>
               <style>
-                body {{ font-family: "Microsoft YaHei", sans-serif; padding: 24px; background: #f5f5f5; }}
-                h1 {{ color: #0078d4; }}
-                .meta {{ color: #555; margin-bottom: 16px; }}
-                table {{ border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.1); }}
-                th, td {{ padding: 10px 14px; border: 1px solid #e0e0e0; }}
-                th {{ background: #0078d4; color: #fff; }}
-                .total {{ font-weight: bold; font-size: 1.2em; margin-top: 16px; color: #0078d4; }}
+                body { font-family: "Microsoft YaHei", sans-serif; padding: 24px; background: #f5f5f5; }
+                h1 { color: #0078d4; }
+                .meta { color: #555; margin-bottom: 16px; }
+                table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+                th, td { padding: 10px 14px; border: 1px solid #e0e0e0; }
+                th { background: #0078d4; color: #fff; }
+                .total { font-weight: bold; font-size: 1.2em; margin-top: 16px; color: #0078d4; }
               </style>
             </head>
             <body>
               <h1>🧹 DiskSlim 清理报告</h1>
               <p class="meta">
-                清理时间：{System.Net.WebUtility.HtmlEncode(report.CompletedAtText)}&nbsp;&nbsp;
-                耗时：{System.Net.WebUtility.HtmlEncode(report.DurationText)}
+                清理时间：{{System.Net.WebUtility.HtmlEncode(report.CompletedAtText)}}&nbsp;&nbsp;
+                耗时：{{System.Net.WebUtility.HtmlEncode(report.DurationText)}}
               </p>
               <table>
                 <thead>
                   <tr><th>清理项目</th><th>释放空间</th><th>状态</th></tr>
                 </thead>
                 <tbody>
-            {rows}
+            {{rows}}
                 </tbody>
               </table>
-              <p class="total">总共释放：{System.Net.WebUtility.HtmlEncode(report.TotalFreedText)}</p>
+              <p class="total">总共释放：{{System.Net.WebUtility.HtmlEncode(report.TotalFreedText)}}</p>
               <p style="color:#aaa;font-size:.85em">由 DiskSlim - C盘瘦身大师 生成</p>
             </body>
             </html>
