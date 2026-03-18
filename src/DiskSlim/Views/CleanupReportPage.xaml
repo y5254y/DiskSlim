@@ -130,6 +130,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
@@ -160,6 +161,13 @@
                     </StackPanel>
                 </Button>
                 <Button Grid.Column="2"
+                        Command="{x:Bind ViewModel.ExportToCsvCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE9F9;" FontSize="14"/>
+                        <TextBlock Text="导出 CSV"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="3"
                         Style="{StaticResource AccentButtonStyle}"
                         Command="{x:Bind ViewModel.ExportToHtmlCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">

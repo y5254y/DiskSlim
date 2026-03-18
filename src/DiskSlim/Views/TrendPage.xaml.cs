@@ -1,4 +1,5 @@
 using DiskSlim.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -17,12 +18,13 @@ public sealed partial class TrendPage : Page
     {
         ViewModel = App.Services.GetRequiredService<TrendViewModel>();
         this.InitializeComponent();
-        Loaded += async (_, _) => await ViewModel.LoadTrendDataAsync();
-        ViewModel.PropertyChanged += (_, e) =>
+        Loaded += async (_, _) =>
         {
-            if (e.PropertyName == nameof(TrendViewModel.TrendPoints))
-                DrawTrendChart();
+            await ViewModel.LoadTrendDataAsync();
+            DrawTrendChart();
         };
+        // 监听集合变化，重新绘制图表
+        ViewModel.TrendPoints.CollectionChanged += (_, _) => DrawTrendChart();
     }
 
     /// <summary>

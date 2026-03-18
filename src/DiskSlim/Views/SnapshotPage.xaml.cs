@@ -1,4 +1,5 @@
 using DiskSlim.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
 namespace DiskSlim.Views;

@@ -36,6 +36,11 @@ public interface ICleanupReportService
     string ExportToHtml(CleanupReport report);
 
     /// <summary>
+    /// 将报告导出为 CSV 格式内容
+    /// </summary>
+    string ExportToCsv(CleanupReport report);
+
+    /// <summary>
     /// 初始化数据库（建表等），应在应用启动时调用
     /// </summary>
     Task InitializeAsync();

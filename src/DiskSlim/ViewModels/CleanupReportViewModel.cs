@@ -124,6 +124,25 @@ public partial class CleanupReportViewModel : ObservableObject
     }
 
     /// <summary>
+    /// 将选中报告导出为 CSV 文件
+    /// </summary>
+    [RelayCommand]
+    private async Task ExportToCsvAsync()
+    {
+        if (SelectedReport == null) return;
+
+        try
+        {
+            string content = _reportService.ExportToCsv(SelectedReport);
+            await SaveFileAsync(content, "DiskSlim_清理报告.csv", "csv");
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"导出失败：{ex.Message}";
+        }
+    }
+
+    /// <summary>
     /// 使用文件保存对话框保存文件
     /// </summary>
     private static async Task SaveFileAsync(string content, string suggestedName, string extension)
@@ -134,6 +153,8 @@ public partial class CleanupReportViewModel : ObservableObject
 
         if (extension == "txt")
             picker.FileTypeChoices.Add("文本文件", new List<string> { ".txt" });
+        else if (extension == "csv")
+            picker.FileTypeChoices.Add("CSV 文件", new List<string> { ".csv" });
         else
             picker.FileTypeChoices.Add("HTML 文件", new List<string> { ".html" });
 

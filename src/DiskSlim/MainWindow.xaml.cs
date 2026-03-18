@@ -60,6 +60,11 @@ public sealed partial class MainWindow : Window
                 "Migration" => typeof(MigrationPage),
                 "SoftwareMove" => typeof(SoftwareMovePage),
                 "CleanupReport" => typeof(CleanupReportPage),
+                // Phase 3 新增页面
+                "Snapshot" => typeof(SnapshotPage),
+                "Trend" => typeof(TrendPage),
+                "OldFiles" => typeof(OldFilesPage),
+                "Settings" => typeof(SettingsPage),
                 _ => null
             };
 
