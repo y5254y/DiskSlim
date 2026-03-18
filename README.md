@@ -10,7 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4)](https://www.microsoft.com/store)
-[![Framework](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
+[![Framework](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com/)
 [![UI](https://img.shields.io/badge/UI-WinUI%203-0078D4)](https://learn.microsoft.com/windows/apps/winui/winui3/)
 
 </div>
@@ -69,7 +69,28 @@ repartitioning or system reinstallation.
 ### 📋 清理历史报告 / Cleanup History
 - 每次清理后自动生成报告（清理项目、释放空间、耗时）
 - 应用内查看历史清理记录
-- 支持导出为 TXT 或 HTML 文件
+- 支持导出为 TXT、CSV 或 HTML 文件
+
+### 📸 历史快照与对比 / Snapshot History & Comparison *(Phase 3)*
+- 保存C盘扫描快照（含时间戳、磁盘大小、各文件夹明细）
+- 查看和管理所有历史快照
+- 两次快照空间对比，高亮增长/缩减的文件夹
+
+### 📈 增长趋势分析 / Growth Trend Analysis *(Phase 3)*
+- 基于历史快照绘制C盘空间使用折线图
+- 支持 7天/30天/90天/全部 时间范围查看
+- 自动计算增长速率并预测C盘何时会满
+
+### 🔍 旧文件/临时文件检测 / Old & Temp File Detection *(Phase 3)*
+- 扫描长期未访问的旧文件（可配置：30/90/180/365天）
+- 检测 .tmp/.temp/.bak/.old/.log 等临时文件
+- 检测零字节空文件和 .dmp 崩溃转储文件
+- 批量选择并移动到回收站
+
+### ⏰ 定时扫描 + 通知 / Scheduled Scan & Notifications *(Phase 3)*
+- 设置定时自动扫描计划（每天/每周/每月）
+- 通过 Windows 任务计划程序注册定时任务
+- 磁盘空间不足时发送 Windows Toast 通知
 
 ### 📂 文件夹迁移 / Folder Migration
 将用户文件夹（桌面/文档/下载/图片/视频/音乐）迁移到其他磁盘，通过符号链接保持原路径透明可用
@@ -83,8 +104,8 @@ repartitioning or system reinstallation.
 
 | 层次 | 技术 |
 |------|------|
-| UI 框架 | WinUI 3 + Windows App SDK 1.6 |
-| 语言/运行时 | C# / .NET 8 |
+| UI 框架 | WinUI 3 + Windows App SDK 1.8 |
+| 语言/运行时 | C# / .NET 10 |
 | 架构 | MVVM (CommunityToolkit.Mvvm) |
 | 依赖注入 | Microsoft.Extensions.DependencyInjection |
 | 数据存储 | SQLite (Microsoft.Data.Sqlite) |
@@ -101,10 +122,10 @@ repartitioning or system reinstallation.
 ## 🚀 开发环境要求 / Development Requirements
 
 - **操作系统**: Windows 10 版本 1903+ / Windows 11（推荐）
-- **IDE**: Visual Studio 2022 17.8+ 或 JetBrains Rider 2024+
+- **IDE**: Visual Studio 2022 17.8+ 或 Visual Studio 2026（推荐）
 - **SDK**:
-  - .NET 8.0 SDK
-  - Windows App SDK 1.6
+  - .NET 10.0 SDK
+  - Windows App SDK 1.8
   - Windows 10 SDK 10.0.19041.0+
 - **工作负载**: "Windows 应用程序开发"（Visual Studio）
 
@@ -133,7 +154,7 @@ dotnet build src/DiskSlim/DiskSlim.csproj -c Debug -r win-x64
 
 ## 🗺️ 路线图 / Roadmap
 
-### Phase 1 — MVP（当前）
+### Phase 1 — MVP ✅
 - [x] 项目架构搭建（MVVM + DI）
 - [x] 磁盘扫描服务
 - [x] 智能清理服务（10+ 清理项）
@@ -150,11 +171,21 @@ dotnet build src/DiskSlim/DiskSlim.csproj -c Debug -r win-x64
 - [x] 安全等级标注系统完善（🟡/🔴级别清理弹出确认对话框）
 - [x] 清理详情报告（历史记录、导出 TXT/HTML）
 
-### Phase 3 — Pro 版
-- [ ] 历史快照与空间趋势分析
+### Phase 3 — Pro 版 ✅
+- [x] **📸 历史快照** — SQLite 存储磁盘扫描快照，含文件夹明细，可查看、删除和管理
+- [x] **📊 快照对比** — 选择两个快照进行差异对比，高亮显示空间增减变化
+- [x] **📈 趋势分析** — 基于历史快照绘制折线图，计算增长速率，预测C盘满载时间
+- [x] **🔍 旧文件检测** — 扫描长期未访问文件、临时文件、空文件、崩溃转储文件
+- [x] **🗑️ 安全删除** — 批量移动文件到回收站，在资源管理器中打开文件位置
+- [x] **📄 CSV 导出** — 清理报告增加 CSV 格式导出，TXT/CSV/HTML 三种格式可选
+- [x] **⏰ 定时扫描** — 通过 Windows 任务计划程序设置每天/每周/每月自动扫描
+- [x] **🔔 空间通知** — 配置C盘空间阈值，触发 Windows Toast 通知
+- [x] **⚙️ 设置页面** — 统一管理定时扫描、通知阈值、关于信息等设置
+
+### Phase 4 — 未来计划
 - [ ] Compact OS 系统压缩
 - [ ] WSL 磁盘空间回收
-- [ ] 系统托盘 + 空间预警通知
+- [ ] 系统托盘图标 + 实时空间显示
 - [ ] Microsoft Store 正式发布
 
 ---

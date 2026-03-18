@@ -136,7 +136,9 @@ public partial class TrendViewModel : ObservableObject
                     {
                         double deltaGB = last.UsedGB - first.UsedGB;
                         double dailyGB = deltaGB / days;
-                        GrowthRateText = $"{dailyGB:+0.00;-0.00} GB/天";
+                        GrowthRateText = dailyGB == 0
+                            ? "±0.00 GB/天（稳定）"
+                            : $"{dailyGB:+0.00;-0.00} GB/天";
 
                         // 预测
                         CalculatePrediction(last, dailyGB);

@@ -240,6 +240,10 @@ public class CleanupReportService : ICleanupReportService
         return field;
     }
 
+    /// <summary>
+    /// 将报告导出为 HTML 格式
+    /// </summary>
+    public string ExportToHtml(CleanupReport report)
     {
         var rows = new StringBuilder();
         foreach (var item in report.Items)

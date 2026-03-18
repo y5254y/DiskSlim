@@ -31,7 +31,9 @@ public class ScheduleService : IScheduleService
         await UnregisterScheduledTaskAsync();
 
         // 创建新任务
-        string args = $"/create /tn \"{TaskName}\" /tr \"\\\"{exePath}\\\" --autoscan\" " +
+        // 对可执行文件路径中的双引号进行转义，避免命令注入风险
+        string safeExePath = exePath.Replace("\"", "\\\"");
+        string args = $"/create /tn \"{TaskName}\" /tr \"\\\"{safeExePath}\\\" --autoscan\" " +
                       $"/sc {scheduleArg} /st {timeStr} /f /ru INTERACTIVE";
 
         var psi = new ProcessStartInfo("schtasks.exe", args)
@@ -118,8 +120,9 @@ public class ScheduleService : IScheduleService
                 if (closeQuote >= 0 && closeQuote + 2 < trimmed.Length)
                 {
                     string rest = trimmed[(closeQuote + 2)..]; // 跳过 ","
-                    string nextRun = rest.StartsWith('"')
-                        ? rest[1..rest.IndexOf('"', 1)]
+                    int restCloseIdx = rest.StartsWith('"') ? rest.IndexOf('"', 1) : -1;
+                    string nextRun = restCloseIdx > 0
+                        ? rest[1..restCloseIdx]
                         : rest.Split(',')[0];
                     nextRun = nextRun.Trim();
                     if (DateTime.TryParse(nextRun, out var dt))

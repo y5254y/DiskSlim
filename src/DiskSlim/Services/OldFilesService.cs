@@ -186,6 +186,7 @@ public class OldFilesService : IOldFilesService
                 var fileOp = new SHFILEOPSTRUCT
                 {
                     wFunc = FO_DELETE,
+                    // SHFileOperation 要求 pFrom 为双 null 结尾的字符串（SHFILEOPSTRUCT 规范）
                     pFrom = filePath + "\0\0",
                     fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT
                 };

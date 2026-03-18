@@ -157,7 +157,7 @@
                                     <TextBlock Grid.Column="1" Text="{x:Bind TooltipText}"
                                                HorizontalAlignment="Right" VerticalAlignment="Center"
                                                FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="2" Text="{x:Bind UsedGB}"
+                                    <TextBlock Grid.Column="2" Text="{x:Bind TooltipText}"
                                                HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                 </Grid>
                             </DataTemplate>
