@@ -33,7 +33,7 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // 注册服务接口与实现
+        // 注册服务接口与实现（Phase 1 + 2）
         services.AddSingleton<IDiskScanService, DiskScanService>();
         services.AddSingleton<ICleanupService, CleanupService>();
         services.AddSingleton<IMigrationService, MigrationService>();
@@ -41,13 +41,25 @@ public partial class App : Application
         services.AddSingleton<ISoftwareScanService, SoftwareScanService>();
         services.AddSingleton<ICleanupReportService, CleanupReportService>();
 
-        // 注册 ViewModel
+        // Phase 3 Pro 版新增服务
+        services.AddSingleton<ISnapshotService, SnapshotService>();
+        services.AddSingleton<IOldFilesService, OldFilesService>();
+        services.AddSingleton<IScheduleService, ScheduleService>();
+        services.AddSingleton<INotificationService, NotificationService>();
+
+        // 注册 ViewModel（Phase 1 + 2）
         services.AddTransient<MainViewModel>();
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<CleanupViewModel>();
         services.AddTransient<MigrationViewModel>();
         services.AddTransient<SoftwareMoveViewModel>();
         services.AddTransient<CleanupReportViewModel>();
+
+        // Phase 3 Pro 版新增 ViewModel
+        services.AddTransient<SnapshotViewModel>();
+        services.AddTransient<TrendViewModel>();
+        services.AddTransient<OldFilesViewModel>();
+        services.AddTransient<SettingsViewModel>();
 
         return services.BuildServiceProvider();
     }
@@ -60,6 +72,10 @@ public partial class App : Application
         // 初始化清理报告数据库
         var reportService = Services.GetRequiredService<ICleanupReportService>();
         await reportService.InitializeAsync();
+
+        // 初始化快照数据库（Phase 3）
+        var snapshotService = Services.GetRequiredService<ISnapshotService>();
+        await snapshotService.InitializeAsync();
 
         MainWindow = new MainWindow();
         MainWindow.Activate();

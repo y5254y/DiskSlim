@@ -71,10 +71,47 @@
                         <FontIcon Glyph="&#xE9F9;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
+                <NavigationViewItem
+                    x:Name="NavSnapshot"
+                    Content="历史快照"
+                    Tag="Snapshot">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEA35;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    x:Name="NavTrend"
+                    Content="趋势分析"
+                    Tag="Trend">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    x:Name="NavOldFiles"
+                    Content="旧文件检测"
+                    Tag="OldFiles">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE721;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <!-- 底部操作项（主题切换） -->
+            <!-- 底部操作项（主题切换、设置） -->
             <NavigationView.FooterMenuItems>
+                <NavigationViewItem
+                    x:Name="NavSettings"
+                    Content="设置"
+                    Tag="Settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem
                     x:Name="NavThemeToggle"
                     Content="切换主题"

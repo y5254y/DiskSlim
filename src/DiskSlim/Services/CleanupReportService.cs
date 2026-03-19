@@ -209,6 +209,38 @@ public class CleanupReportService : ICleanupReportService
     }
 
     /// <summary>
+    /// 将报告导出为 CSV 格式
+    /// </summary>
+    public string ExportToCsv(CleanupReport report)
+    {
+        var sb = new StringBuilder();
+        // CSV 标题行
+        sb.AppendLine("清理项目,释放空间(字节),释放空间,状态,错误信息");
+        foreach (var item in report.Items)
+        {
+            string status = item.Success ? "成功" : "失败";
+            string error = item.ErrorMessage ?? string.Empty;
+            // 对含逗号或引号的字段进行 CSV 转义
+            sb.AppendLine($"{CsvEscape(item.Name)},{item.FreedBytes},{CsvEscape(item.FreedText)},{status},{CsvEscape(error)}");
+        }
+        sb.AppendLine();
+        sb.AppendLine($"总计,,{CsvEscape(report.TotalFreedText)},,");
+        sb.AppendLine($"清理时间,{CsvEscape(report.CompletedAtText)},,,");
+        sb.AppendLine($"耗时,{CsvEscape(report.DurationText)},,,");
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// CSV 字段转义（含逗号/引号/换行时加双引号包裹）
+    /// </summary>
+    private static string CsvEscape(string field)
+    {
+        if (field.Contains(',') || field.Contains('"') || field.Contains('\n'))
+            return $"\"{field.Replace("\"", "\"\"")}\"";
+        return field;
+    }
+
+    /// <summary>
     /// 将报告导出为 HTML 格式
     /// </summary>
     public string ExportToHtml(CleanupReport report)
