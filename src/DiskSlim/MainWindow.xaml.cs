@@ -93,6 +93,9 @@ public sealed partial class MainWindow : Window
                 "Trend" => typeof(TrendPage),
                 "OldFiles" => typeof(OldFilesPage),
                 "Settings" => typeof(SettingsPage),
+                // Phase 4 新增页面
+                "CompactOs" => typeof(CompactOsPage),
+                "Wsl" => typeof(WslPage),
                 _ => null
             };
 

@@ -101,6 +101,26 @@
                         <FontIcon Glyph="&#xE721;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+
+                <NavigationViewItemSeparator/>
+
+                <NavigationViewItem
+                    x:Name="NavCompactOs"
+                    Content="系统压缩"
+                    Tag="CompactOs">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7EA;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
+                    x:Name="NavWsl"
+                    Content="WSL 瘦身"
+                    Tag="Wsl">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE756;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <!-- 底部操作项（设置） -->
