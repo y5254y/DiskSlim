@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.Views;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -12,10 +13,7 @@ namespace DiskSlim;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    /// <summary>
-    /// 当前主题模式（深色/浅色）
-    /// </summary>
-    private ElementTheme _currentTheme = ElementTheme.Default;
+    private bool _permissionHintShown;
 
     /// <summary>
     /// 内容导航框架，供页面间导航使用
@@ -27,9 +25,39 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         SetupWindow();
 
+        this.Activated += MainWindow_Activated;
+
         // 默认导航到仪表盘页面
         NavView.SelectedItem = NavDashboard;
         ContentFrame.Navigate(typeof(DashboardPage));
+    }
+
+    private async void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+    {
+        if (_permissionHintShown || args.WindowActivationState == WindowActivationState.Deactivated)
+            return;
+
+        _permissionHintShown = true;
+        if (AdminHelper.IsRunningAsAdmin())
+            return;
+
+        if (Content is not FrameworkElement root)
+            return;
+
+        var dialog = new ContentDialog
+        {
+            Title = "当前为普通权限模式",
+            Content = "DiskSlim 已正常启动。涉及系统目录、服务或休眠设置的操作可能需要管理员权限。你可以继续使用，或现在提权后重启。",
+            PrimaryButtonText = "继续使用",
+            SecondaryButtonText = "提权后重启",
+            CloseButtonText = "关闭",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = root.XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Secondary)
+            AdminHelper.RestartAsAdmin();
     }
 
     /// <summary>
@@ -72,28 +100,6 @@ public sealed partial class MainWindow : Window
             {
                 PageTitle.Text = item.Content?.ToString() ?? string.Empty;
                 ContentFrame.Navigate(pageType);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 点击底部"切换主题"时，在深色和浅色之间切换
-    /// </summary>
-    private void ThemeToggle_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
-    {
-        if (Content is FrameworkElement root)
-        {
-            if (_currentTheme == ElementTheme.Light || _currentTheme == ElementTheme.Default)
-            {
-                _currentTheme = ElementTheme.Dark;
-                root.RequestedTheme = ElementTheme.Dark;
-                ThemeIcon.Glyph = "\uE706"; // 太阳图标（切换回浅色）
-            }
-            else
-            {
-                _currentTheme = ElementTheme.Light;
-                root.RequestedTheme = ElementTheme.Light;
-                ThemeIcon.Glyph = "\uE793"; // 月亮图标（切换回深色）
             }
         }
     }

@@ -119,6 +119,27 @@ public class SoftwareScanService : ISoftwareScanService
 
         string installLocation = key.GetValue("InstallLocation")?.ToString() ?? string.Empty;
 
+        bool installPathExists = !string.IsNullOrEmpty(installLocation) && Directory.Exists(installLocation);
+        bool isJunction = false;
+        string? migratedToPath = null;
+
+        if (installPathExists)
+        {
+            try
+            {
+                var attr = File.GetAttributes(installLocation);
+                isJunction = (attr & FileAttributes.ReparsePoint) != 0;
+                if (isJunction)
+                {
+                    migratedToPath = new DirectoryInfo(installLocation).LinkTarget ?? "(Junction)";
+                }
+            }
+            catch
+            {
+                // 忽略路径属性读取失败，保持默认值
+            }
+        }
+
         return new SoftwareInfo
         {
             DisplayName = displayName,
@@ -129,7 +150,8 @@ public class SoftwareScanService : ISoftwareScanService
             InstallDate = installDate,
             UninstallString = key.GetValue("UninstallString")?.ToString() ?? string.Empty,
             RegistryKey = registryPath,
-            CanMigrate = !string.IsNullOrEmpty(installLocation) && Directory.Exists(installLocation)
+            CanMigrate = installPathExists && !isJunction,
+            MigratedToPath = migratedToPath
         };
     }
 }

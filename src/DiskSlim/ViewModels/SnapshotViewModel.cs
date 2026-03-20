@@ -82,7 +82,7 @@ public partial class SnapshotViewModel : ObservableObject
                 Snapshots.Add(s);
 
             HasSnapshots = Snapshots.Count > 0;
-            StatusMessage = HasSnapshots ? $"共 {Snapshots.Count} 个快照" : "暂无快照，点击"新建快照"保存当前状态";
+            StatusMessage = HasSnapshots ? $"共 {Snapshots.Count} 个快照" : "暂无快照，点击【新建快照】保存当前状态";
 
             if (HasSnapshots && SelectedSnapshot == null)
                 SelectedSnapshot = Snapshots[0];

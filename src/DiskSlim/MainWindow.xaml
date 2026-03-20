@@ -12,6 +12,7 @@
             x:Name="NavView"
             PaneDisplayMode="Left"
             IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
             SelectionChanged="NavView_SelectionChanged"
             OpenPaneLength="220">
 
@@ -102,7 +103,7 @@
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <!-- 底部操作项（主题切换、设置） -->
+            <!-- 底部操作项（设置） -->
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem
                     x:Name="NavSettings"
@@ -110,16 +111,6 @@
                     Tag="Settings">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE713;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem
-                    x:Name="NavThemeToggle"
-                    Content="切换主题"
-                    Tag="ThemeToggle"
-                    SelectsOnInvoked="False"
-                    Tapped="ThemeToggle_Tapped">
-                    <NavigationViewItem.Icon>
-                        <FontIcon x:Name="ThemeIcon" Glyph="&#xE793;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.FooterMenuItems>

@@ -148,7 +148,42 @@ dotnet build src/DiskSlim/DiskSlim.csproj -c Debug -r win-x64
 # 打开 DiskSlim.sln，选择 x64 平台，按 F5 运行
 ```
 
-> ⚠️ **注意**: 需要以管理员权限运行才能访问系统文件和创建符号链接
+---
+
+## 📦 发布说明 / Publish Guide
+
+项目提供两条发布路线：
+
+- `Store`：用于 Microsoft Store（MSIX）
+- `Direct`：用于直接分发给用户（目录直发，自包含）
+
+### A. Visual Studio 发布（推荐）
+
+1. 在解决方案资源管理器中右键 `src/DiskSlim/DiskSlim.csproj` → `发布(Publish)`
+2. 打开发布页后，在顶部 `配置文件(Profile)` 下拉框选择：
+   - `Store`（商店）
+   - `Direct`（直发）
+3. 点击 `发布(Publish)`
+4. 产物目录：
+   - Store：`src/DiskSlim/bin/x64/Release/net10.0-windows10.0.19041.0/publish/store/`
+   - Direct：`src/DiskSlim/bin/x64/Release/net10.0-windows10.0.19041.0/publish/direct/`
+
+### B. 命令行发布
+
+```bash
+# Store 路线（MSIX）
+dotnet publish src/DiskSlim/DiskSlim.csproj -c Release /p:PublishProfile=Store
+
+# Direct 路线（目录直发，自包含）
+dotnet publish src/DiskSlim/DiskSlim.csproj -c Release /p:PublishProfile=Direct
+```
+
+### C. 直发给用户时的注意事项
+
+- 请分发 `publish/direct` 下的**整个目录**，不要只发 `DiskSlim.exe`
+- 首次运行涉及高权限操作时，应用会按需请求 UAC 提权
+
+> ⚠️ 普通功能可在普通权限运行；系统级操作会按需提权。
 
 ---
 

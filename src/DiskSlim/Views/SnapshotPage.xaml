@@ -117,7 +117,7 @@
                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <TextBlock Text="暂无快照" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="点击"新建快照"保存当前状态"
+                    <TextBlock Text="点击【新建快照】保存当前状态"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                HorizontalAlignment="Center"/>

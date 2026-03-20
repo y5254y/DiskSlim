@@ -47,6 +47,9 @@ public partial class CleanupItem : ObservableObject
         _ => string.Empty
     };
 
+    /// <summary>是否需要管理员权限才能执行该清理项</summary>
+    public bool RequiresAdmin { get; set; }
+
     /// <summary>
     /// 执行实际清理的委托，由 CleanupService 填充
     /// </summary>

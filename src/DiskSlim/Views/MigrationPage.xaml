@@ -74,7 +74,7 @@
                             </StackPanel>
 
                             <TextBlock Grid.Column="2" VerticalAlignment="Center"
-                                       Text="{x:Bind SizeBytes, Converter={StaticResource FileSizeConverter}}"
+                                       Text="{x:Bind SizeBytes, Mode=OneWay, Converter={StaticResource FileSizeConverter}}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </Grid>
                     </DataTemplate>

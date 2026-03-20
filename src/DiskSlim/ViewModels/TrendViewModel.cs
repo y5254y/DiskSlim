@@ -153,7 +153,7 @@ public partial class TrendViewModel : ObservableObject
             }
             else
             {
-                StatusMessage = "所选时间范围内无快照数据，请先在"历史快照"页创建快照";
+                StatusMessage = "所选时间范围内无快照数据，请先在【历史快照】页创建快照";
                 PredictionText = string.Empty;
                 HasPrediction = false;
             }

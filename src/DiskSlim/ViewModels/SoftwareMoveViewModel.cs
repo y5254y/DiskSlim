@@ -18,6 +18,9 @@ public partial class SoftwareMoveViewModel : ObservableObject
     // ===== 软件列表 =====
     public ObservableCollection<SoftwareInfo> SoftwareList { get; } = new();
 
+    // ===== 可选目标盘符列表（扫描系统中实际存在的非系统盘） =====
+    public ObservableCollection<string> AvailableDrives { get; } = new();
+
     // ===== 筛选选项 =====
 
     [ObservableProperty]
@@ -32,7 +35,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
     private SoftwareInfo? _selectedSoftware;
 
     [ObservableProperty]
-    private string _targetDrive = "D:";
+    private string _targetDrive = string.Empty;
 
     // ===== 状态 =====
 
@@ -51,10 +54,37 @@ public partial class SoftwareMoveViewModel : ObservableObject
     [ObservableProperty]
     private string _systemDriveTotalSizeText = "--";
 
+    private sealed record CopyResult(int CopiedFiles, int FailedFiles, string? FirstError);
+
     public SoftwareMoveViewModel(ISoftwareScanService softwareScanService, ISymlinkService symlinkService)
     {
         _softwareScanService = softwareScanService;
         _symlinkService = symlinkService;
+        LoadDrives();
+    }
+
+    /// <summary>
+    /// 扫描系统中可用的非系统盘盘符
+    /// </summary>
+    private void LoadDrives()
+    {
+        AvailableDrives.Clear();
+        try
+        {
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (drive.DriveType == DriveType.Fixed &&
+                    !drive.Name.StartsWith("C", StringComparison.OrdinalIgnoreCase))
+                {
+                    AvailableDrives.Add(drive.Name.TrimEnd('\\'));
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        TargetDrive = AvailableDrives.Count > 0 ? AvailableDrives[0] : "D:";
     }
 
     /// <summary>
@@ -104,9 +134,31 @@ public partial class SoftwareMoveViewModel : ObservableObject
     private async Task MoveSoftwareAsync()
     {
         if (SelectedSoftware == null || IsMoving) return;
+
+        string sourcePath = SelectedSoftware.InstallLocation.TrimEnd('\\');
+        if (_symlinkService.IsJunction(sourcePath))
+        {
+            SelectedSoftware.CanMigrate = false;
+            SelectedSoftware.MigratedToPath ??= _symlinkService.GetJunctionTarget(sourcePath) ?? "(Junction)";
+            StatusMessage = $"{SelectedSoftware.DisplayName} 已经是搬家后的链接目录，无需重复搬家";
+            return;
+        }
+
         if (!SelectedSoftware.CanMigrate)
         {
             StatusMessage = "该软件无法迁移（安装路径不明确或已迁移）";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(TargetDrive))
+        {
+            StatusMessage = "请先选择目标盘符";
+            return;
+        }
+
+        if (!DriveInfo.GetDrives().Any(d => d.Name.StartsWith(TargetDrive, StringComparison.OrdinalIgnoreCase)))
+        {
+            StatusMessage = $"目标盘 {TargetDrive} 不存在，请重新选择";
             return;
         }
 
@@ -115,17 +167,47 @@ public partial class SoftwareMoveViewModel : ObservableObject
 
         try
         {
-            string sourcePath = SelectedSoftware.InstallLocation.TrimEnd('\\');
+            if (!AdminHelper.IsRunningAsAdmin())
+            {
+                StatusMessage = "请以管理员身份运行后再执行软件搬家";
+                return;
+            }
+
+            if (!Directory.Exists(sourcePath))
+            {
+                StatusMessage = "源安装目录不存在，无法迁移";
+                return;
+            }
+
             string folderName = Path.GetFileName(sourcePath);
-            string targetPath = Path.Combine(TargetDrive, "Programs", folderName);
+            string driveRoot = TargetDrive.EndsWith('\\') ? TargetDrive : TargetDrive + "\\";
+            string targetPath = Path.Combine(driveRoot, "Programs", folderName);
 
             // 确保目标目录存在
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
 
             // 复制软件文件到目标路径
-            await CopySoftwareFilesAsync(sourcePath, targetPath);
+            StatusMessage = $"正在复制文件：{SelectedSoftware.DisplayName} → {targetPath}";
+            var copyProgress = new Progress<(int Copied, string CurrentFile)>(p =>
+            {
+                if (p.Copied % 20 == 0)
+                {
+                    string fileName = Path.GetFileName(p.CurrentFile);
+                    StatusMessage = $"正在复制文件：{SelectedSoftware.DisplayName}（已复制 {p.Copied} 个，当前：{fileName}）";
+                }
+            });
+            var copyResult = await CopySoftwareFilesAsync(sourcePath, targetPath, copyProgress);
+
+            if (copyResult.FailedFiles > 0)
+            {
+                throw new InvalidOperationException(
+                    $"复制失败：共有 {copyResult.FailedFiles} 个文件未复制。{copyResult.FirstError}");
+            }
+
+            StatusMessage = $"复制完成，共 {copyResult.CopiedFiles} 个文件，正在验证符号链接能力...";
 
             // 先验证能否创建 Junction 链接（用临时路径测试），避免删除源目录后链接创建失败
+            StatusMessage = "正在验证符号链接能力...";
             string tempJunction = sourcePath + "__slim_test__";
             bool testSuccess = await _symlinkService.CreateJunctionAsync(tempJunction, targetPath);
             if (testSuccess)
@@ -134,15 +216,17 @@ public partial class SoftwareMoveViewModel : ObservableObject
             }
             else
             {
-                // 无法创建链接，清理已复制的目标文件，报告错误
                 try { Directory.Delete(targetPath, recursive: true); } catch { }
-                StatusMessage = "创建符号链接失败，请以管理员权限运行";
+                StatusMessage = "创建符号链接失败，请确认管理员权限和目标路径权限";
                 return;
             }
 
             // 链接可创建，删除源目录，建立正式 Junction
+            StatusMessage = "正在删除原目录并创建正式链接...";
             Directory.Delete(sourcePath, recursive: true);
-            await _symlinkService.CreateJunctionAsync(sourcePath, targetPath);
+            bool finalLinkCreated = await _symlinkService.CreateJunctionAsync(sourcePath, targetPath);
+            if (!finalLinkCreated)
+                throw new InvalidOperationException("正式符号链接创建失败，已复制文件请手动检查");
 
             SelectedSoftware.MigratedToPath = targetPath;
             SelectedSoftware.CanMigrate = false;
@@ -161,39 +245,79 @@ public partial class SoftwareMoveViewModel : ObservableObject
     /// <summary>
     /// 复制软件文件到目标路径（使用队列避免深层递归）
     /// </summary>
-    private static async Task CopySoftwareFilesAsync(string source, string destination)
+    private static async Task<CopyResult> CopySoftwareFilesAsync(
+        string source,
+        string destination,
+        IProgress<(int Copied, string CurrentFile)>? progress = null)
     {
-        await Task.Run(() =>
+        return await Task.Run(() =>
         {
             var queue = new Queue<(string src, string dst)>();
             queue.Enqueue((source, destination));
 
+            int copiedFiles = 0;
+            int failedFiles = 0;
+            string? firstError = null;
+
             while (queue.Count > 0)
             {
                 var (src, dst) = queue.Dequeue();
-                Directory.CreateDirectory(dst);
 
-                foreach (var file in new DirectoryInfo(src).GetFiles())
+                try
+                {
+                    Directory.CreateDirectory(dst);
+                }
+                catch (Exception ex)
+                {
+                    failedFiles++;
+                    firstError ??= $"无法创建目录：{dst}，{ex.Message}";
+                    continue;
+                }
+
+                IEnumerable<FileInfo> files;
+                try
+                {
+                    files = new DirectoryInfo(src).GetFiles();
+                }
+                catch (Exception ex)
+                {
+                    failedFiles++;
+                    firstError ??= $"无法读取目录：{src}，{ex.Message}";
+                    continue;
+                }
+
+                foreach (var file in files)
                 {
                     try
                     {
                         file.CopyTo(Path.Combine(dst, file.Name), overwrite: true);
+                        copiedFiles++;
+                        progress?.Report((copiedFiles, file.FullName));
                     }
-                    catch (IOException)
+                    catch (Exception ex)
                     {
-                        // 文件被占用（软件正在运行），跳过并继续
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        // 权限不足，跳过
+                        failedFiles++;
+                        firstError ??= $"无法复制文件：{file.FullName}，{ex.Message}";
                     }
                 }
 
-                foreach (var subDir in new DirectoryInfo(src).GetDirectories())
+                DirectoryInfo[] subDirs;
+                try
                 {
-                    queue.Enqueue((subDir.FullName, Path.Combine(dst, subDir.Name)));
+                    subDirs = new DirectoryInfo(src).GetDirectories();
                 }
+                catch (Exception ex)
+                {
+                    failedFiles++;
+                    firstError ??= $"无法读取子目录：{src}，{ex.Message}";
+                    continue;
+                }
+
+                foreach (var subDir in subDirs)
+                    queue.Enqueue((subDir.FullName, Path.Combine(dst, subDir.Name)));
             }
+
+            return new CopyResult(copiedFiles, failedFiles, firstError);
         });
     }
 }
