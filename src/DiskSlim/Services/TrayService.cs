@@ -7,8 +7,9 @@ namespace DiskSlim.Services;
 /// </summary>
 public class TrayService : ITrayService
 {
-    // 托盘消息 ID（自定义 WM_APP 范围消息）
-    private const uint WmTrayIcon = 0x8000;
+    // 托盘消息 ID（WM_APP 基址 0x8000 + 1，避免与其他 WM_APP 消息冲突）
+    private const uint WmApp = 0x8000;
+    private const uint WmTrayIcon = WmApp + 1;
 
     // Shell_NotifyIcon 操作码
     private const uint NimAdd = 0x00000000;

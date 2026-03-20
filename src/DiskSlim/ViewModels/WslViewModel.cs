@@ -164,7 +164,7 @@ public partial class WslViewModel : ObservableObject
 
         try
         {
-            foreach (var dist in Distributions.Where(d => d.VhdxFound).ToList())
+            foreach (var dist in Distributions.Where(d => d.VhdxFound))
             {
                 var result = await _wslService.ReclaimDiskSpaceAsync(dist, progress);
                 OutputLog += result.Output + Environment.NewLine;

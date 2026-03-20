@@ -20,6 +20,11 @@ public partial class App : Application
     /// </summary>
     public static MainWindow? MainWindow { get; private set; }
 
+    /// <summary>
+    /// 托盘图标刷新定时器（保持引用以防 GC 回收）
+    /// </summary>
+    private static System.Timers.Timer? _trayTimer;
+
     public App()
     {
         this.InitializeComponent();
@@ -108,10 +113,10 @@ public partial class App : Application
 
             // 立即更新一次，然后每 30 秒刷新
             UpdateTrayTooltip(trayService);
-            var timer = new System.Timers.Timer(30_000);
-            timer.Elapsed += (_, _) => UpdateTrayTooltip(trayService);
-            timer.AutoReset = true;
-            timer.Start();
+            _trayTimer = new System.Timers.Timer(30_000);
+            _trayTimer.Elapsed += (_, _) => UpdateTrayTooltip(trayService);
+            _trayTimer.AutoReset = true;
+            _trayTimer.Start();
         }
         catch
         {

@@ -155,6 +155,10 @@ public class WslService : IWslService
     private static async Task<(string Output, string Error)> RunDiskpartCompactAsync(
         string vhdxPath, CancellationToken cancellationToken)
     {
+        // 验证路径中不含会破坏 diskpart 脚本语法的特殊字符
+        if (vhdxPath.Contains('"'))
+            throw new InvalidOperationException($"vhdx 路径包含不支持的字符（引号）：{vhdxPath}");
+
         // 创建临时 diskpart 脚本文件
         var scriptPath = Path.Combine(Path.GetTempPath(), $"diskslim_wsl_{Guid.NewGuid():N}.txt");
         try
