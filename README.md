@@ -217,11 +217,11 @@ dotnet publish src/DiskSlim/DiskSlim.csproj -c Release /p:PublishProfile=Direct
 - [x] **🔔 空间通知** — 配置C盘空间阈值，触发 Windows Toast 通知
 - [x] **⚙️ 设置页面** — 统一管理定时扫描、通知阈值、关于信息等设置
 
-### Phase 4 — 未来计划
-- [ ] Compact OS 系统压缩
-- [ ] WSL 磁盘空间回收
-- [ ] 系统托盘图标 + 实时空间显示
-- [ ] Microsoft Store 正式发布
+### Phase 4 — 正式版 ✅
+- [x] Compact OS 系统压缩
+- [x] WSL 磁盘空间回收
+- [x] 系统托盘图标 + 实时空间显示
+- [x] Microsoft Store 正式发布
 
 ---
 
