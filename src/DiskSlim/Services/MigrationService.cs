@@ -108,13 +108,19 @@ public class MigrationService : IMigrationService
                 }),
                 cancellationToken);
 
-            // 阶段4：删除源目录，创建 Junction 链接
-            progress?.Report(new MigrationProgress("正在创建符号链接...", copied, task.TotalSizeBytes, string.Empty));
-            Directory.Delete(task.SourcePath, recursive: true);
-            bool junctionCreated = await _symlinkService.CreateJunctionAsync(task.SourcePath, task.DestinationPath);
-            task.HasSymlink = junctionCreated;
+            // 阶段4：删除源目录（该步骤可能耗时）
+            progress?.Report(new MigrationProgress("正在删除原目录...", copied, task.TotalSizeBytes, string.Empty));
+            await DeleteSourceDirectoryAsync(task.SourcePath, cancellationToken);
 
-            // 阶段5：更新注册表（可选，Junction 方式不强制更新）
+            // 阶段5：创建 Junction 链接
+            progress?.Report(new MigrationProgress("正在创建符号链接...", copied, task.TotalSizeBytes, string.Empty));
+            bool junctionCreated = await _symlinkService.CreateJunctionAsync(task.SourcePath, task.DestinationPath);
+            if (!junctionCreated)
+                throw new InvalidOperationException("创建符号链接失败，请以管理员身份运行后重试");
+
+            task.HasSymlink = true;
+
+            // 阶段6：更新注册表（可选，Junction 方式不强制更新）
             progress?.Report(new MigrationProgress("正在更新系统配置...", copied, task.TotalSizeBytes, string.Empty));
 
             task.Status = MigrationStatus.Completed;
@@ -166,6 +172,107 @@ public class MigrationService : IMigrationService
     private bool IsAlreadyMigrated(string path)
     {
         return _symlinkService.IsJunction(path);
+    }
+
+    /// <summary>删除源目录（使用可取消的迭代遍历，跳过重解析点）</summary>
+    private static async Task DeleteSourceDirectoryAsync(string sourcePath, CancellationToken ct)
+    {
+        await Task.Run(() =>
+        {
+            if (!Directory.Exists(sourcePath))
+                return;
+
+            var visitedDirs = new List<string>();
+            var pending = new Stack<string>();
+            pending.Push(sourcePath);
+
+            while (pending.Count > 0)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var current = pending.Pop();
+                visitedDirs.Add(current);
+
+                try
+                {
+                    foreach (var file in Directory.EnumerateFiles(current))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        var fi = new FileInfo(file);
+                        try
+                        {
+                            fi.Attributes = FileAttributes.Normal;
+                            fi.Delete();
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new IOException($"无法删除文件：{file}。请关闭占用该文件的程序后重试。", ex);
+                        }
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    continue;
+                }
+                catch (Exception ex) when (ex is not IOException)
+                {
+                    throw new IOException($"无法访问目录：{current}", ex);
+                }
+
+                try
+                {
+                    foreach (var dir in Directory.EnumerateDirectories(current))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        FileAttributes attr;
+                        try
+                        {
+                            attr = File.GetAttributes(dir);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new IOException($"无法读取目录属性：{dir}", ex);
+                        }
+
+                        if ((attr & FileAttributes.ReparsePoint) != 0)
+                        {
+                            try
+                            {
+                                Directory.Delete(dir, false);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new IOException($"无法删除重解析点目录：{dir}", ex);
+                            }
+                            continue;
+                        }
+
+                        pending.Push(dir);
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    continue;
+                }
+                catch (Exception ex) when (ex is not IOException)
+                {
+                    throw new IOException($"无法枚举子目录：{current}", ex);
+                }
+            }
+
+            for (int i = visitedDirs.Count - 1; i >= 0; i--)
+            {
+                ct.ThrowIfCancellationRequested();
+                try
+                {
+                    Directory.Delete(visitedDirs[i], false);
+                }
+                catch (Exception ex)
+                {
+                    throw new IOException($"无法删除目录：{visitedDirs[i]}", ex);
+                }
+            }
+        }, ct);
     }
 
     /// <summary>递归计算文件夹大小</summary>

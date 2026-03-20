@@ -191,7 +191,7 @@
                 <TextBlock Text="暂无趋势数据"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center"/>
-                <TextBlock Text="请先在"历史快照"页面创建多个快照，之后趋势图将自动显示"
+                <TextBlock Text="请先在【历史快照】页面创建多个快照，之后趋势图将自动显示"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                            HorizontalAlignment="Center"

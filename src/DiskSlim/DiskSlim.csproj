@@ -4,16 +4,34 @@
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>DiskSlim</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;arm64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>Assets\app-icon.ico</ApplicationIcon>
+
+    <!-- 默认渠道：Store（兼容 VS F5 打包部署） -->
+    <DistributionChannel Condition="'$(DistributionChannel)' == ''">Store</DistributionChannel>
+  </PropertyGroup>
+
+  <!-- Store 路线：MSIX 打包 -->
+  <PropertyGroup Condition="'$(DistributionChannel)' == 'Store'">
+    <ApplicationManifest>app.store.manifest</ApplicationManifest>
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <SelfContained>false</SelfContained>
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+  </PropertyGroup>
+
+  <!-- Direct 路线：目录直发（Unpackaged + Self-contained） -->
+  <PropertyGroup Condition="'$(DistributionChannel)' == 'Direct'">
+    <ApplicationManifest>app.direct.manifest</ApplicationManifest>
+    <WindowsPackageType>None</WindowsPackageType>
+    <SelfContained>true</SelfContained>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>

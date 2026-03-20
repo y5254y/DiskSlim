@@ -52,7 +52,7 @@ public partial class App : Application
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<CleanupViewModel>();
         services.AddTransient<MigrationViewModel>();
-        services.AddTransient<SoftwareMoveViewModel>();
+        services.AddSingleton<SoftwareMoveViewModel>();
         services.AddTransient<CleanupReportViewModel>();
 
         // Phase 3 Pro 版新增 ViewModel

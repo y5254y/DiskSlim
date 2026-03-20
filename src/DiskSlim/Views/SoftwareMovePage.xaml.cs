@@ -1,6 +1,7 @@
 using DiskSlim.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace DiskSlim.Views;
 
@@ -14,6 +15,7 @@ public sealed partial class SoftwareMovePage : Page
     public SoftwareMovePage()
     {
         this.InitializeComponent();
+        NavigationCacheMode = NavigationCacheMode.Enabled;
         ViewModel = App.Services.GetRequiredService<SoftwareMoveViewModel>();
     }
 }

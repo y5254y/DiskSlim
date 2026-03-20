@@ -35,6 +35,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE74D",
                 IsSelected = true,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanTempFolderAsync(
                     @"C:\Windows\Temp", progress, ct)
             },
@@ -45,6 +46,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE74F",
                 IsSelected = true,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanRecycleBinAsync(progress, ct)
             },
             new CleanupItem
@@ -54,6 +56,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE7BA",
                 IsSelected = true,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanFolderAsync(
                     @"C:\ProgramData\Microsoft\Windows\WER", progress, ct)
             },
@@ -73,6 +76,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE9F9",
                 IsSelected = true,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanLogFilesAsync(progress, ct)
             },
 
@@ -208,6 +212,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE895",
                 IsSelected = false,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanWindowsUpdateCacheAsync(progress, ct)
             },
             new CleanupItem
@@ -217,6 +222,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE895",
                 IsSelected = false,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanWindowsOldAsync(progress, ct)
             },
             new CleanupItem
@@ -237,6 +243,7 @@ public class CleanupService : ICleanupService
                 Safety = SafetyLevel.Danger,
                 IconGlyph = "\uE823",
                 IsSelected = false,
+                RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await DisableHibernationAsync(progress, ct)
             },
             new CleanupItem

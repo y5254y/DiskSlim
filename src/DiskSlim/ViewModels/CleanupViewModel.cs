@@ -17,6 +17,13 @@ public partial class CleanupViewModel : ObservableObject
     private readonly ICleanupReportService _reportService;
     private CancellationTokenSource? _cts;
 
+    private enum AdminAction
+    {
+        Cancel,
+        ContinueWithoutAdmin,
+        RestartAsAdmin
+    }
+
     // ===== 清理项目列表 =====
     public ObservableCollection<CleanupItem> CleanupItems { get; } = new();
 
@@ -63,6 +70,9 @@ public partial class CleanupViewModel : ObservableObject
         _cleanupService = cleanupService;
         _reportService = reportService;
         LoadCleanupItems();
+
+        if (!AdminHelper.IsRunningAsAdmin())
+            StatusMessage = "当前为普通用户模式（部分项目需管理员权限）";
     }
 
     /// <summary>
@@ -137,9 +147,46 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
 
+        var runnableItems = selectedItems.ToList();
+        int skippedByPermission = 0;
+
+        // 非管理员时：对需管理员项目进行按需提权处理
+        if (!AdminHelper.IsRunningAsAdmin())
+        {
+            var adminItems = selectedItems.Where(i => i.RequiresAdmin).ToList();
+            if (adminItems.Count > 0)
+            {
+                var action = XamlRoot != null
+                    ? await ShowAdminRequirementDialogAsync(adminItems)
+                    : AdminAction.ContinueWithoutAdmin;
+
+                if (action == AdminAction.Cancel)
+                {
+                    StatusMessage = "清理已取消";
+                    return;
+                }
+
+                if (action == AdminAction.RestartAsAdmin)
+                {
+                    StatusMessage = "正在请求管理员权限...";
+                    AdminHelper.RestartAsAdmin();
+                    return;
+                }
+
+                runnableItems = selectedItems.Where(i => !i.RequiresAdmin).ToList();
+                skippedByPermission = selectedItems.Count - runnableItems.Count;
+            }
+        }
+
+        if (runnableItems.Count == 0)
+        {
+            StatusMessage = "当前所选项目均需要管理员权限，请提权后重试";
+            return;
+        }
+
         // 检查是否包含🟡或🔴级别项目，需要确认
-        var cautionItems = selectedItems.Where(i => i.Safety == SafetyLevel.Caution).ToList();
-        var dangerItems = selectedItems.Where(i => i.Safety == SafetyLevel.Danger).ToList();
+        var cautionItems = runnableItems.Where(i => i.Safety == SafetyLevel.Caution).ToList();
+        var dangerItems = runnableItems.Where(i => i.Safety == SafetyLevel.Danger).ToList();
 
         if ((cautionItems.Count > 0 || dangerItems.Count > 0) && XamlRoot != null)
         {
@@ -171,7 +218,7 @@ public partial class CleanupViewModel : ObservableObject
             // 逐项清理并记录明细
             long totalFreed = 0;
             int completed = 0;
-            foreach (var item in selectedItems)
+            foreach (var item in runnableItems)
             {
                 if (_cts.Token.IsCancellationRequested) break;
                 if (item.CleanAction == null) continue;
@@ -181,7 +228,7 @@ public partial class CleanupViewModel : ObservableObject
                 {
                     var itemProgress = new Progress<long>(bytes =>
                     {
-                        progress.Report(new CleanupProgress(item.Name, totalFreed + bytes, completed, selectedItems.Count));
+                        progress.Report(new CleanupProgress(item.Name, totalFreed + bytes, completed, runnableItems.Count));
                     });
                     long freed = await item.CleanAction(itemProgress, _cts.Token);
                     reportItem.FreedBytes = freed;
@@ -202,7 +249,9 @@ public partial class CleanupViewModel : ObservableObject
             TotalCleanedSize = totalFreed;
             TotalCleanedSizeText = FileSizeHelper.Format(totalFreed);
             CleanProgress = 100;
-            StatusMessage = $"清理完成！共释放 {TotalCleanedSizeText}";
+            StatusMessage = skippedByPermission > 0
+                ? $"清理完成！共释放 {TotalCleanedSizeText}，另有 {skippedByPermission} 项因权限不足未执行"
+                : $"清理完成！共释放 {TotalCleanedSizeText}";
 
             // 仅在至少清理了一项时保存报告
             if (report.Items.Count > 0)
@@ -210,7 +259,7 @@ public partial class CleanupViewModel : ObservableObject
                 report.CompletedAt = DateTime.Now;
                 report.TotalFreedBytes = totalFreed;
                 try { await _reportService.SaveReportAsync(report); }
-                catch { /* 报告保存失败不影响主清理流程，用户仍看到清理完成提示 */ }
+                catch { }
             }
         }
         catch (OperationCanceledException)
@@ -254,6 +303,36 @@ public partial class CleanupViewModel : ObservableObject
     {
         TotalSelectedSize = CleanupItems.Where(i => i.IsSelected).Sum(i => i.EstimatedSize);
         TotalSelectedSizeText = FileSizeHelper.Format(TotalSelectedSize);
+    }
+
+    private async Task<AdminAction> ShowAdminRequirementDialogAsync(List<CleanupItem> adminItems)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("以下项目需要管理员权限：");
+        sb.AppendLine();
+        foreach (var item in adminItems)
+            sb.AppendLine($"  • {item.Name}");
+        sb.AppendLine();
+        sb.AppendLine("你可以选择仅清理当前可执行项目，或提权后重启应用继续。 ");
+
+        var dialog = new ContentDialog
+        {
+            Title = "需要管理员权限",
+            Content = sb.ToString().Trim(),
+            PrimaryButtonText = "仅清理可执行项",
+            SecondaryButtonText = "提权后重启",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        return result switch
+        {
+            ContentDialogResult.Primary => AdminAction.ContinueWithoutAdmin,
+            ContentDialogResult.Secondary => AdminAction.RestartAsAdmin,
+            _ => AdminAction.Cancel
+        };
     }
 
     /// <summary>

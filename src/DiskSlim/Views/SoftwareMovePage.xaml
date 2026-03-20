@@ -49,6 +49,7 @@
 
             <!-- 扫描按钮 -->
             <Button Grid.Column="2"
+                    Style="{StaticResource AccentButtonStyle}"
                     Command="{x:Bind ViewModel.ScanSoftwareCommand}"
                     IsEnabled="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -59,12 +60,17 @@
 
             <!-- 目标盘选择 -->
             <ComboBox Grid.Column="3" Header="目标盘符"
+                      ItemsSource="{x:Bind ViewModel.AvailableDrives, Mode=OneWay}"
+                      SelectedItem="{x:Bind ViewModel.TargetDrive, Mode=TwoWay}"/>
+            <!--
+            <ComboBox Grid.Column="3" Header="目标盘符"
                       SelectedValue="{x:Bind ViewModel.TargetDrive, Mode=TwoWay}">
                 <ComboBoxItem Content="D:"/>
                 <ComboBoxItem Content="E:"/>
                 <ComboBoxItem Content="F:"/>
                 <ComboBoxItem Content="G:"/>
             </ComboBox>
+            -->
 
             <!-- 迁移按钮 -->
             <Button Grid.Column="4"
