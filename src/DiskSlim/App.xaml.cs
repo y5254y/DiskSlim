@@ -115,7 +115,7 @@ public partial class App : Application
         }
         catch
         {
-            // 托盘图标初始化失败不影响主程序正常运行
+            // 托盘图标初始化失败不影响主程序正常运行（如运行在无图形界面的环境中）
         }
     }
 

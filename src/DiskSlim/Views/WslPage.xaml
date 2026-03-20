@@ -140,7 +140,10 @@
                                                 CornerRadius="4"
                                                 Padding="6,2"
                                                 Visibility="{x:Bind IsRunning, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                <TextBlock Text="运行中" FontSize="11" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <FontIcon Glyph="&#xE768;" FontSize="10" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
+                                                    <TextBlock Text="运行中" FontSize="11" Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
+                                                </StackPanel>
                                             </Border>
                                         </StackPanel>
                                         <TextBlock

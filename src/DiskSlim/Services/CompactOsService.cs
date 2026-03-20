@@ -98,8 +98,11 @@ public class CompactOsService : ICompactOsService
         string error = await process.StandardError.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
 
-        if (process.ExitCode != 0 && !string.IsNullOrWhiteSpace(error))
-            throw new InvalidOperationException($"compact.exe 返回错误（退出码 {process.ExitCode}）：{error}");
+        if (process.ExitCode != 0)
+        {
+            var errorMsg = !string.IsNullOrWhiteSpace(error) ? error : output;
+            throw new InvalidOperationException($"compact.exe 返回错误（退出码 {process.ExitCode}）：{errorMsg}");
+        }
 
         return string.IsNullOrWhiteSpace(output) ? error : output;
     }

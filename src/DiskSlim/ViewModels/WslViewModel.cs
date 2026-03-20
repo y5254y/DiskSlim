@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using DiskSlim.Services;
 
@@ -86,7 +87,7 @@ public partial class WslViewModel : ObservableObject
             else
             {
                 long totalVhdx = Distributions.Sum(d => d.VhdxSizeBytes);
-                StatusMessage = $"找到 {Distributions.Count} 个发行版，虚拟磁盘总计 {FormatBytes(totalVhdx)}";
+                StatusMessage = $"找到 {Distributions.Count} 个发行版，虚拟磁盘总计 {FileSizeHelper.Format(totalVhdx)}";
             }
         }
         catch (Exception ex)
@@ -123,7 +124,7 @@ public partial class WslViewModel : ObservableObject
             {
                 TotalSavedBytes += result.SavedBytes;
                 StatusMessage = result.SavedBytes > 0
-                    ? $"✅ {distribution.Name} 完成！释放了 {FormatBytes(result.SavedBytes)}"
+                    ? $"✅ {distribution.Name} 完成！释放了 {FileSizeHelper.Format(result.SavedBytes)}"
                     : $"✅ {distribution.Name} 压缩完成（空间已是最优）";
 
                 // 更新列表中该发行版的 vhdx 大小
@@ -176,7 +177,7 @@ public partial class WslViewModel : ObservableObject
             }
 
             StatusMessage = TotalSavedBytes > 0
-                ? $"✅ 全部完成！共释放 {FormatBytes(TotalSavedBytes)}"
+                ? $"✅ 全部完成！共释放 {FileSizeHelper.Format(TotalSavedBytes)}"
                 : "✅ 全部压缩完成（空间已是最优）";
         }
         catch (Exception ex)
@@ -187,12 +188,5 @@ public partial class WslViewModel : ObservableObject
         {
             IsReclaiming = false;
         }
-    }
-
-    private static string FormatBytes(long bytes)
-    {
-        if (bytes >= 1_073_741_824) return $"{bytes / 1_073_741_824.0:F1} GB";
-        if (bytes >= 1_048_576) return $"{bytes / 1_048_576.0:F1} MB";
-        return $"{bytes / 1024.0:F1} KB";
     }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 
 namespace DiskSlim.Services;
@@ -127,7 +128,7 @@ public class WslService : IWslService
                 fullOutput.Append(diskpartError);
             }
 
-            progress?.Report($"[{distribution.Name}] 完成！节省 {FormatBytes(sizeBefore - sizeAfter)}");
+            progress?.Report($"[{distribution.Name}] 完成！节省 {FileSizeHelper.Format(sizeBefore - sizeAfter)}");
 
             return new WslReclaimResult(
                 IsSuccess: true,
@@ -181,7 +182,7 @@ public class WslService : IWslService
         }
         finally
         {
-            // 清理临时脚本文件
+            // 清理临时脚本文件；删除失败不影响主流程（如文件已被系统清理）
             try { File.Delete(scriptPath); } catch { }
         }
     }
@@ -290,12 +291,5 @@ public class WslService : IWslService
     {
         try { return new FileInfo(path).Length; }
         catch { return 0; }
-    }
-
-    private static string FormatBytes(long bytes)
-    {
-        if (bytes >= 1_073_741_824) return $"{bytes / 1_073_741_824.0:F1} GB";
-        if (bytes >= 1_048_576) return $"{bytes / 1_048_576.0:F1} MB";
-        return $"{bytes / 1024.0:F1} KB";
     }
 }
