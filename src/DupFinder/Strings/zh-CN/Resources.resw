@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, ...</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, ...</value>
+  </resheader>
+
+  <!-- MainWindow -->
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>重复文件扫描</value>
+  </data>
+  <data name="NavScan.Content" xml:space="preserve">
+    <value>重复文件扫描</value>
+  </data>
+  <data name="NavSettings.Content" xml:space="preserve">
+    <value>设置</value>
+  </data>
+
+  <!-- ScanPage -->
+  <data name="ScanPageFolderLabel.Text" xml:space="preserve">
+    <value>扫描文件夹：</value>
+  </data>
+  <data name="ScanPageBrowseText.Text" xml:space="preserve">
+    <value>浏览</value>
+  </data>
+  <data name="ScanPageMinSizeLabel.Text" xml:space="preserve">
+    <value>最小文件：</value>
+  </data>
+  <data name="ScanPageFileTypeLabel.Text" xml:space="preserve">
+    <value>文件类型：</value>
+  </data>
+  <data name="ScanPageSubdirCheck.Content" xml:space="preserve">
+    <value>包含子文件夹</value>
+  </data>
+  <data name="ScanPageStartScanText.Text" xml:space="preserve">
+    <value>开始扫描</value>
+  </data>
+  <data name="ScanPageCancelText.Text" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="ScanPageSelectAllDupText.Text" xml:space="preserve">
+    <value>选择所有副本</value>
+  </data>
+  <data name="ScanPageKeepNewestText.Text" xml:space="preserve">
+    <value>保留最新</value>
+  </data>
+  <data name="ScanPageKeepOldestText.Text" xml:space="preserve">
+    <value>保留最旧</value>
+  </data>
+  <data name="ScanPageSelectNoneText.Text" xml:space="preserve">
+    <value>取消全选</value>
+  </data>
+  <data name="ScanPageSelectedSuffix.Text" xml:space="preserve">
+    <value>个文件已选，合计</value>
+  </data>
+  <data name="ScanPageMoveToRecycleBin.Text" xml:space="preserve">
+    <value>移到回收站</value>
+  </data>
+  <data name="ScanPageEmptyHint.Text" xml:space="preserve">
+    <value>选择要扫描的文件夹，点击「开始扫描」按钮查找重复文件</value>
+  </data>
+  <data name="ScanPageTotalGroupsPrefix.Text" xml:space="preserve">
+    <value>共</value>
+  </data>
+  <data name="ScanPageTotalGroupsSuffix.Text" xml:space="preserve">
+    <value>组重复  ·  可节省</value>
+  </data>
+
+  <!-- SettingsPage -->
+  <data name="SettingsPageLangTitle.Text" xml:space="preserve">
+    <value>界面语言</value>
+  </data>
+  <data name="SettingsPageLangLabel.Text" xml:space="preserve">
+    <value>显示语言</value>
+  </data>
+  <data name="SettingsPageLangDesc.Text" xml:space="preserve">
+    <value>更改后重启应用生效</value>
+  </data>
+  <data name="SettingsPageApplyText.Text" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="SettingsPageScanTitle.Text" xml:space="preserve">
+    <value>扫描默认设置</value>
+  </data>
+  <data name="SettingsPageSkipHiddenLabel.Text" xml:space="preserve">
+    <value>跳过隐藏文件</value>
+  </data>
+  <data name="SettingsPageSkipHiddenDesc.Text" xml:space="preserve">
+    <value>忽略以"."开头或系统标记为隐藏的文件</value>
+  </data>
+  <data name="SettingsPageSkipSystemLabel.Text" xml:space="preserve">
+    <value>跳过系统文件</value>
+  </data>
+  <data name="SettingsPageSkipSystemDesc.Text" xml:space="preserve">
+    <value>忽略系统属性标记的文件，避免误删关键文件</value>
+  </data>
+  <data name="SettingsPageSubdirLabel.Text" xml:space="preserve">
+    <value>默认包含子文件夹</value>
+  </data>
+  <data name="SettingsPageSubdirDesc.Text" xml:space="preserve">
+    <value>扫描时默认递归处理所有子目录</value>
+  </data>
+  <data name="SettingsPageAboutTitle.Text" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="SettingsPageVersionPrefix.Text" xml:space="preserve">
+    <value>版本：</value>
+  </data>
+
+  <!-- ViewModel 字符串 -->
+  <data name="Vm.Scan.AllFiles" xml:space="preserve">
+    <value>所有文件</value>
+  </data>
+  <data name="Vm.Scan.Hint" xml:space="preserve">
+    <value>选择文件夹后点击「开始扫描」查找重复文件</value>
+  </data>
+  <data name="Vm.Scan.NoFolder" xml:space="preserve">
+    <value>请先选择要扫描的文件夹</value>
+  </data>
+  <data name="Vm.Scan.Starting" xml:space="preserve">
+    <value>正在准备扫描…</value>
+  </data>
+  <data name="Vm.Scan.Canceled" xml:space="preserve">
+    <value>扫描已取消</value>
+  </data>
+  <data name="Vm.Scan.NoDup" xml:space="preserve">
+    <value>扫描完成，未发现重复文件</value>
+  </data>
+  <data name="Vm.Scan.NoneSelected" xml:space="preserve">
+    <value>请先勾选要删除的文件</value>
+  </data>
+  <data name="Vm.Scan.Deleting" xml:space="preserve">
+    <value>正在移动到回收站…</value>
+  </data>
+
+  <!-- Service 字符串 -->
+  <data name="Svc.Dup.PhaseEnum" xml:space="preserve">
+    <value>正在枚举文件…</value>
+  </data>
+  <data name="Svc.Dup.PhaseHash" xml:space="preserve">
+    <value>正在计算哈希…</value>
+  </data>
+</root>

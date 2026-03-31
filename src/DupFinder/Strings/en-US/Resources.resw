@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, ...</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, ...</value>
+  </resheader>
+
+  <!-- MainWindow -->
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>Duplicate Files</value>
+  </data>
+  <data name="NavScan.Content" xml:space="preserve">
+    <value>Duplicate Scan</value>
+  </data>
+  <data name="NavSettings.Content" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+
+  <!-- ScanPage -->
+  <data name="ScanPageFolderLabel.Text" xml:space="preserve">
+    <value>Scan Folder:</value>
+  </data>
+  <data name="ScanPageBrowseText.Text" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="ScanPageMinSizeLabel.Text" xml:space="preserve">
+    <value>Min Size:</value>
+  </data>
+  <data name="ScanPageFileTypeLabel.Text" xml:space="preserve">
+    <value>File Type:</value>
+  </data>
+  <data name="ScanPageSubdirCheck.Content" xml:space="preserve">
+    <value>Include Subfolders</value>
+  </data>
+  <data name="ScanPageStartScanText.Text" xml:space="preserve">
+    <value>Start Scan</value>
+  </data>
+  <data name="ScanPageCancelText.Text" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ScanPageSelectAllDupText.Text" xml:space="preserve">
+    <value>Select All Duplicates</value>
+  </data>
+  <data name="ScanPageKeepNewestText.Text" xml:space="preserve">
+    <value>Keep Newest</value>
+  </data>
+  <data name="ScanPageKeepOldestText.Text" xml:space="preserve">
+    <value>Keep Oldest</value>
+  </data>
+  <data name="ScanPageSelectNoneText.Text" xml:space="preserve">
+    <value>Deselect All</value>
+  </data>
+  <data name="ScanPageSelectedSuffix.Text" xml:space="preserve">
+    <value>files selected, total</value>
+  </data>
+  <data name="ScanPageMoveToRecycleBin.Text" xml:space="preserve">
+    <value>Move to Recycle Bin</value>
+  </data>
+  <data name="ScanPageEmptyHint.Text" xml:space="preserve">
+    <value>Select a folder and click "Start Scan" to find duplicate files</value>
+  </data>
+  <data name="ScanPageTotalGroupsPrefix.Text" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ScanPageTotalGroupsSuffix.Text" xml:space="preserve">
+    <value>duplicate groups  ·  can save</value>
+  </data>
+
+  <!-- SettingsPage -->
+  <data name="SettingsPageLangTitle.Text" xml:space="preserve">
+    <value>Display Language</value>
+  </data>
+  <data name="SettingsPageLangLabel.Text" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SettingsPageLangDesc.Text" xml:space="preserve">
+    <value>Restart the app to apply changes</value>
+  </data>
+  <data name="SettingsPageApplyText.Text" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="SettingsPageScanTitle.Text" xml:space="preserve">
+    <value>Scan Defaults</value>
+  </data>
+  <data name="SettingsPageSkipHiddenLabel.Text" xml:space="preserve">
+    <value>Skip Hidden Files</value>
+  </data>
+  <data name="SettingsPageSkipHiddenDesc.Text" xml:space="preserve">
+    <value>Ignore files marked as hidden by the system</value>
+  </data>
+  <data name="SettingsPageSkipSystemLabel.Text" xml:space="preserve">
+    <value>Skip System Files</value>
+  </data>
+  <data name="SettingsPageSkipSystemDesc.Text" xml:space="preserve">
+    <value>Ignore system-flagged files to avoid accidental deletion</value>
+  </data>
+  <data name="SettingsPageSubdirLabel.Text" xml:space="preserve">
+    <value>Include Subfolders by Default</value>
+  </data>
+  <data name="SettingsPageSubdirDesc.Text" xml:space="preserve">
+    <value>Recursively scan all subdirectories during scan</value>
+  </data>
+  <data name="SettingsPageAboutTitle.Text" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="SettingsPageVersionPrefix.Text" xml:space="preserve">
+    <value>Version:</value>
+  </data>
+
+  <!-- ViewModel strings -->
+  <data name="Vm.Scan.AllFiles" xml:space="preserve">
+    <value>All Files</value>
+  </data>
+  <data name="Vm.Scan.Hint" xml:space="preserve">
+    <value>Select a folder and click "Start Scan" to find duplicate files</value>
+  </data>
+  <data name="Vm.Scan.NoFolder" xml:space="preserve">
+    <value>Please select a folder to scan first</value>
+  </data>
+  <data name="Vm.Scan.Starting" xml:space="preserve">
+    <value>Preparing scan…</value>
+  </data>
+  <data name="Vm.Scan.Canceled" xml:space="preserve">
+    <value>Scan canceled</value>
+  </data>
+  <data name="Vm.Scan.NoDup" xml:space="preserve">
+    <value>Scan complete — no duplicate files found</value>
+  </data>
+  <data name="Vm.Scan.NoneSelected" xml:space="preserve">
+    <value>Please select files to delete first</value>
+  </data>
+  <data name="Vm.Scan.Deleting" xml:space="preserve">
+    <value>Moving to Recycle Bin…</value>
+  </data>
+
+  <!-- Service strings -->
+  <data name="Svc.Dup.PhaseEnum" xml:space="preserve">
+    <value>Enumerating files…</value>
+  </data>
+  <data name="Svc.Dup.PhaseHash" xml:space="preserve">
+    <value>Computing hashes…</value>
+  </data>
+</root>

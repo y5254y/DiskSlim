@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="DupFinder.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DupFinder"
+    xmlns:views="using:DupFinder.Views"
+    Title="DupFinder - 重复文件清理">
+
+    <Grid>
+        <NavigationView
+            x:Name="NavView"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            SelectionChanged="NavView_SelectionChanged"
+            OpenPaneLength="200">
+
+            <!-- 顶部标题区域 -->
+            <NavigationView.Header>
+                <Grid Padding="0,4,0,0">
+                    <TextBlock
+                        x:Name="PageTitle"
+                        x:Uid="PageTitle"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        Text="重复文件扫描"/>
+                </Grid>
+            </NavigationView.Header>
+
+            <!-- 导航菜单项 -->
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    x:Name="NavScan"
+                    x:Uid="NavScan"
+                    Content="重复文件扫描"
+                    Tag="Scan">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8C8;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <!-- 底部操作项（设置） -->
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem
+                    x:Name="NavSettings"
+                    x:Uid="NavSettings"
+                    Content="设置"
+                    Tag="Settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE713;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <!-- 页面内容区域 -->
+            <Frame x:Name="ContentFrame" Margin="0,-44,0,0" />
+        </NavigationView>
+    </Grid>
+</Window>

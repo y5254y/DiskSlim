@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>DupFinder</RootNamespace>
+    <Platforms>x86;x64;arm64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Assets\app-icon.ico</ApplicationIcon>
+
+    <!-- 默认渠道：Store（兼容 VS F5 打包部署） -->
+    <DistributionChannel Condition="'$(DistributionChannel)' == ''">Store</DistributionChannel>
+  </PropertyGroup>
+
+  <!-- Store 路线：MSIX 打包 -->
+  <PropertyGroup Condition="'$(DistributionChannel)' == 'Store'">
+    <ApplicationManifest>app.store.manifest</ApplicationManifest>
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <SelfContained>false</SelfContained>
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(DistributionChannel)' == 'Store'">
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+
+  <!-- Direct 路线：目录直发（Unpackaged + Self-contained） -->
+  <PropertyGroup Condition="'$(DistributionChannel)' == 'Direct'">
+    <ApplicationManifest>app.direct.manifest</ApplicationManifest>
+    <WindowsPackageType>None</WindowsPackageType>
+    <SelfContained>true</SelfContained>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Windows App SDK -->
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
+
+    <!-- MVVM 框架 -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+
+    <!-- UI 控件 -->
+    <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
+
+    <!-- 依赖注入 -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\app-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
