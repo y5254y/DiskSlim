@@ -16,33 +16,32 @@ public class CleanupService : ICleanupService
     {
         var items = new List<CleanupItem>
         {
-            // === 🟢 安全级别 ===
             new CleanupItem
             {
-                Name = "用户临时文件",
-                Description = "Windows 在 %TEMP% 中存放的临时文件，程序退出后通常不再需要。可安全删除。",
+                Key = "UserTemp",
+                Name = Localizer.Get("CleanupItem.UserTemp.Name", "用户临时文件"),
+                Description = Localizer.Get("CleanupItem.UserTemp.Description", "Windows 在 %TEMP% 中存放的临时文件，程序退出后通常不再需要。可安全删除。"),
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE74D",
                 IsSelected = true,
-                CleanAction = async (progress, ct) => await CleanTempFolderAsync(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Local\Temp",
-                    progress, ct)
+                CleanAction = async (progress, ct) => await CleanTempFolderAsync(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Local\Temp", progress, ct)
             },
             new CleanupItem
             {
-                Name = "系统临时文件",
-                Description = "Windows 在 C:\\Windows\\Temp 中存放的系统临时文件，可安全删除。",
+                Key = "SystemTemp",
+                Name = Localizer.Get("CleanupItem.SystemTemp.Name", "系统临时文件"),
+                Description = Localizer.Get("CleanupItem.SystemTemp.Description", "Windows 在 C:\\Windows\\Temp 中存放的系统临时文件，可安全删除。"),
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE74D",
                 IsSelected = true,
                 RequiresAdmin = true,
-                CleanAction = async (progress, ct) => await CleanTempFolderAsync(
-                    @"C:\Windows\Temp", progress, ct)
+                CleanAction = async (progress, ct) => await CleanTempFolderAsync(@"C:\Windows\Temp", progress, ct)
             },
             new CleanupItem
             {
-                Name = "回收站",
-                Description = "已删除但尚未永久清除的文件，占用回收站空间。清空后无法通过回收站恢复。",
+                Key = "RecycleBin",
+                Name = Localizer.Get("CleanupItem.RecycleBin.Name", "回收站"),
+                Description = Localizer.Get("CleanupItem.RecycleBin.Description", "已删除但尚未永久清除的文件，占用回收站空间。清空后无法通过回收站恢复。"),
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE74F",
                 IsSelected = true,
@@ -51,19 +50,20 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "Windows 错误报告",
-                Description = "系统崩溃时生成的错误报告文件（.dmp/.wer），通常可安全删除。",
+                Key = "Wer",
+                Name = Localizer.Get("CleanupItem.Wer.Name", "Windows 错误报告"),
+                Description = Localizer.Get("CleanupItem.Wer.Description", "系统崩溃时生成的错误报告文件（.dmp/.wer），通常可安全删除。"),
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE7BA",
                 IsSelected = true,
                 RequiresAdmin = true,
-                CleanAction = async (progress, ct) => await CleanFolderAsync(
-                    @"C:\ProgramData\Microsoft\Windows\WER", progress, ct)
+                CleanAction = async (progress, ct) => await CleanFolderAsync(@"C:\ProgramData\Microsoft\Windows\WER", progress, ct)
             },
             new CleanupItem
             {
-                Name = "缩略图缓存",
-                Description = "Windows 资源管理器为图片/视频生成的预览缩略图缓存，删除后会自动重建，完全安全。",
+                Key = "ThumbnailCache",
+                Name = Localizer.Get("CleanupItem.ThumbnailCache.Name", "缩略图缓存"),
+                Description = Localizer.Get("CleanupItem.ThumbnailCache.Description", "Windows 资源管理器为图片/视频生成的预览缩略图缓存，删除后会自动重建，完全安全。"),
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE91B",
                 IsSelected = true,
@@ -71,20 +71,20 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "日志文件",
-                Description = "系统和应用程序产生的 .log 日志文件，可安全删除。",
+                Key = "Logs",
+                Name = Localizer.Get("CleanupItem.Logs.Name", "日志文件"),
+                Description = Localizer.Get("CleanupItem.Logs.Description", "系统和应用程序产生的 .log 日志文件，可安全删除。"),
                 Safety = SafetyLevel.Safe,
                 IconGlyph = "\uE9F9",
                 IsSelected = true,
                 RequiresAdmin = true,
                 CleanAction = async (progress, ct) => await CleanLogFilesAsync(progress, ct)
             },
-
-            // === 🟡 谨慎级别：浏览器缓存 ===
             new CleanupItem
             {
-                Name = "浏览器缓存（Edge）",
-                Description = "Microsoft Edge 浏览器的缓存文件，清理后下次访问网站会稍慢（需重新下载缓存）。",
+                Key = "BrowserEdge",
+                Name = Localizer.Get("CleanupItem.BrowserEdge.Name", "浏览器缓存（Edge）"),
+                Description = Localizer.Get("CleanupItem.BrowserEdge.Description", "Microsoft Edge 浏览器的缓存文件，清理后下次访问网站会稍慢（需重新下载缓存）。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE774",
                 IsSelected = false,
@@ -92,8 +92,9 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "浏览器缓存（Chrome）",
-                Description = "Google Chrome 浏览器的缓存文件，清理后下次访问网站会稍慢（需重新下载缓存）。",
+                Key = "BrowserChrome",
+                Name = Localizer.Get("CleanupItem.BrowserChrome.Name", "浏览器缓存（Chrome）"),
+                Description = Localizer.Get("CleanupItem.BrowserChrome.Description", "Google Chrome 浏览器的缓存文件，清理后下次访问网站会稍慢（需重新下载缓存）。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE774",
                 IsSelected = false,
@@ -101,76 +102,69 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "浏览器缓存（Firefox）",
-                Description = "Mozilla Firefox 浏览器的缓存文件，清理后下次访问网站会稍慢（需重新下载缓存）。",
+                Key = "BrowserFirefox",
+                Name = Localizer.Get("CleanupItem.BrowserFirefox.Name", "浏览器缓存（Firefox）"),
+                Description = Localizer.Get("CleanupItem.BrowserFirefox.Description", "Mozilla Firefox 浏览器的缓存文件，清理后下次访问网站会稍慢（需重新下载缓存）。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE774",
                 IsSelected = false,
                 CleanAction = async (progress, ct) => await CleanBrowserCacheAsync("Firefox", progress, ct)
             },
-
-            // === 🟡 谨慎级别：开发工具缓存 ===
             new CleanupItem
             {
-                Name = "npm 缓存",
-                Description = "Node.js 包管理器（npm）的本地缓存，位于 %AppData%\\npm-cache，清理后重新安装包时需要重新下载。",
+                Key = "Npm",
+                Name = Localizer.Get("CleanupItem.Npm.Name", "npm 缓存"),
+                Description = Localizer.Get("CleanupItem.Npm.Description", "Node.js 包管理器（npm）的本地缓存，位于 %AppData%\\npm-cache，清理后重新安装包时需要重新下载。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE943",
                 IsSelected = false,
-                CleanAction = async (progress, ct) => await CleanFolderAsync(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm-cache"),
-                    progress, ct)
+                CleanAction = async (progress, ct) => await CleanFolderAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm-cache"), progress, ct)
             },
             new CleanupItem
             {
-                Name = "pip 缓存",
-                Description = "Python 包管理器（pip）的本地缓存，位于 %LocalAppData%\\pip\\cache，清理后重新安装包时需要重新下载。",
+                Key = "Pip",
+                Name = Localizer.Get("CleanupItem.Pip.Name", "pip 缓存"),
+                Description = Localizer.Get("CleanupItem.Pip.Description", "Python 包管理器（pip）的本地缓存，位于 %LocalAppData%\\pip\\cache，清理后重新安装包时需要重新下载。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE943",
                 IsSelected = false,
-                CleanAction = async (progress, ct) => await CleanFolderAsync(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"pip\cache"),
-                    progress, ct)
+                CleanAction = async (progress, ct) => await CleanFolderAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"pip\cache"), progress, ct)
             },
             new CleanupItem
             {
-                Name = "NuGet 缓存",
-                Description = ".NET NuGet 包缓存，位于 %UserProfile%\\.nuget\\packages，清理后 .NET 项目恢复时需要重新下载包。",
+                Key = "NuGet",
+                Name = Localizer.Get("CleanupItem.NuGet.Name", "NuGet 缓存"),
+                Description = Localizer.Get("CleanupItem.NuGet.Description", ".NET NuGet 包缓存，位于 %UserProfile%\\.nuget\\packages，清理后 .NET 项目恢复时需要重新下载包。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE943",
                 IsSelected = false,
-                CleanAction = async (progress, ct) => await CleanFolderAsync(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".nuget\packages"),
-                    progress, ct)
+                CleanAction = async (progress, ct) => await CleanFolderAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".nuget\packages"), progress, ct)
             },
             new CleanupItem
             {
-                Name = "Maven 本地仓库",
-                Description = "Java Maven 构建工具本地仓库（%UserProfile%\\.m2\\repository），清理后 Maven 构建时需要重新下载依赖。",
+                Key = "Maven",
+                Name = Localizer.Get("CleanupItem.Maven.Name", "Maven 本地仓库"),
+                Description = Localizer.Get("CleanupItem.Maven.Description", "Java Maven 构建工具本地仓库（%UserProfile%\\.m2\\repository），清理后 Maven 构建时需要重新下载依赖。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE943",
                 IsSelected = false,
-                CleanAction = async (progress, ct) => await CleanFolderAsync(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".m2\repository"),
-                    progress, ct)
+                CleanAction = async (progress, ct) => await CleanFolderAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".m2\repository"), progress, ct)
             },
             new CleanupItem
             {
-                Name = "Gradle 缓存",
-                Description = "Java Gradle 构建工具缓存（%UserProfile%\\.gradle\\caches），清理后 Gradle 构建时需要重新下载依赖。",
+                Key = "Gradle",
+                Name = Localizer.Get("CleanupItem.Gradle.Name", "Gradle 缓存"),
+                Description = Localizer.Get("CleanupItem.Gradle.Description", "Java Gradle 构建工具缓存（%UserProfile%\\.gradle\\caches），清理后 Gradle 构建时需要重新下载依赖。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE943",
                 IsSelected = false,
-                CleanAction = async (progress, ct) => await CleanFolderAsync(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".gradle\caches"),
-                    progress, ct)
+                CleanAction = async (progress, ct) => await CleanFolderAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".gradle\caches"), progress, ct)
             },
-
-            // === 🟡 谨慎级别：通讯软件缓存 ===
             new CleanupItem
             {
-                Name = "微信缓存",
-                Description = "微信（WeChat）在本地存储的缓存文件，清理后不影响聊天记录，但图片/视频需重新加载。",
+                Key = "WeChat",
+                Name = Localizer.Get("CleanupItem.WeChat.Name", "微信缓存"),
+                Description = Localizer.Get("CleanupItem.WeChat.Description", "微信（WeChat）在本地存储的缓存文件，清理后不影响聊天记录，但图片/视频需重新加载。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE8BD",
                 IsSelected = false,
@@ -178,8 +172,9 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "QQ 缓存",
-                Description = "腾讯 QQ 本地缓存文件，清理后不影响聊天记录，图片/视频需重新加载。",
+                Key = "QQ",
+                Name = Localizer.Get("CleanupItem.QQ.Name", "QQ 缓存"),
+                Description = Localizer.Get("CleanupItem.QQ.Description", "腾讯 QQ 本地缓存文件，清理后不影响聊天记录，图片/视频需重新加载。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE8BD",
                 IsSelected = false,
@@ -187,8 +182,9 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "钉钉缓存",
-                Description = "阿里钉钉本地缓存文件，清理后需重新加载部分资源。",
+                Key = "DingTalk",
+                Name = Localizer.Get("CleanupItem.DingTalk.Name", "钉钉缓存"),
+                Description = Localizer.Get("CleanupItem.DingTalk.Description", "阿里钉钉本地缓存文件，清理后需重新加载部分资源。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE8BD",
                 IsSelected = false,
@@ -196,19 +192,19 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "Microsoft Teams 缓存",
-                Description = "Microsoft Teams 本地缓存，清理后部分资源需重新加载，不影响账号和聊天数据。",
+                Key = "Teams",
+                Name = Localizer.Get("CleanupItem.Teams.Name", "Microsoft Teams 缓存"),
+                Description = Localizer.Get("CleanupItem.Teams.Description", "Microsoft Teams 本地缓存，清理后部分资源需重新加载，不影响账号和聊天数据。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE8BD",
                 IsSelected = false,
                 CleanAction = async (progress, ct) => await CleanTeamsCacheAsync(progress, ct)
             },
-
-            // === 🟡 谨慎级别：Windows 更新残留 ===
             new CleanupItem
             {
-                Name = "Windows Update 残留",
-                Description = "Windows 更新后保留的旧安装包（SoftwareDistribution\\Download），清理后无法回滚更新。建议系统稳定后清理。",
+                Key = "WindowsUpdate",
+                Name = Localizer.Get("CleanupItem.WindowsUpdate.Name", "Windows Update 残留"),
+                Description = Localizer.Get("CleanupItem.WindowsUpdate.Description", "Windows 更新后保留的旧安装包（SoftwareDistribution\\Download），清理后无法回滚更新。建议系统稳定后清理。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE895",
                 IsSelected = false,
@@ -217,8 +213,9 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "Windows.old（旧系统文件）",
-                Description = "升级 Windows 后保留的旧版系统文件夹（C:\\Windows.old），通常占 10~30GB，清理后无法回滚到旧版 Windows。",
+                Key = "WindowsOld",
+                Name = Localizer.Get("CleanupItem.WindowsOld.Name", "Windows.old（旧系统文件）"),
+                Description = Localizer.Get("CleanupItem.WindowsOld.Description", "升级 Windows 后保留的旧版系统文件夹（C:\\Windows.old），通常占 10~30GB，清理后无法回滚到旧版 Windows。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE895",
                 IsSelected = false,
@@ -227,19 +224,19 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "DirectX 着色器缓存",
-                Description = "游戏和3D应用生成的着色器编译缓存，删除后游戏首次启动会重新编译（稍慢）。",
+                Key = "ShaderCache",
+                Name = Localizer.Get("CleanupItem.ShaderCache.Name", "DirectX 着色器缓存"),
+                Description = Localizer.Get("CleanupItem.ShaderCache.Description", "游戏和3D应用生成的着色器编译缓存，删除后游戏首次启动会重新编译（稍慢）。"),
                 Safety = SafetyLevel.Caution,
                 IconGlyph = "\uE7FC",
                 IsSelected = false,
                 CleanAction = async (progress, ct) => await CleanShaderCacheAsync(progress, ct)
             },
-
-            // === 🔴 危险级别 ===
             new CleanupItem
             {
-                Name = "休眠文件 (hiberfil.sys)",
-                Description = "支持休眠功能的系统文件，通常占 RAM 容量的 75%~100%（8GB内存 = 最多8GB）。关闭休眠后可永久释放此空间，但电脑将无法使用休眠功能。",
+                Key = "Hibernation",
+                Name = Localizer.Get("CleanupItem.Hibernation.Name", "休眠文件 (hiberfil.sys)"),
+                Description = Localizer.Get("CleanupItem.Hibernation.Description", "支持休眠功能的系统文件，通常占 RAM 容量的 75%~100%（8GB内存 = 最多8GB）。关闭休眠后可永久释放此空间，但电脑将无法使用休眠功能。"),
                 Safety = SafetyLevel.Danger,
                 IconGlyph = "\uE823",
                 IsSelected = false,
@@ -248,12 +245,13 @@ public class CleanupService : ICleanupService
             },
             new CleanupItem
             {
-                Name = "虚拟内存（页面文件）",
-                Description = "pagefile.sys 是 Windows 虚拟内存文件，通常占 4~16GB。可迁移到其他盘而非删除，直接删除可能导致系统不稳定。",
+                Key = "PageFile",
+                Name = Localizer.Get("CleanupItem.PageFile.Name", "虚拟内存（页面文件）"),
+                Description = Localizer.Get("CleanupItem.PageFile.Description", "pagefile.sys 是 Windows 虚拟内存文件，通常占 4~16GB。可迁移到其他盘而非删除，直接删除可能导致系统不稳定。"),
                 Safety = SafetyLevel.Danger,
                 IconGlyph = "\uE950",
                 IsSelected = false,
-                CleanAction = null // 需要在 UI 中引导用户手动迁移
+                CleanAction = null
             }
         };
 
@@ -274,37 +272,31 @@ public class CleanupService : ICleanupService
 
             try
             {
-                item.EstimatedSize = item.Name switch
+                item.EstimatedSize = item.Key switch
                 {
-                    "用户临时文件" => await GetFolderSizeAsync(
-                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Local\Temp"),
-                    "系统临时文件" => await GetFolderSizeAsync(@"C:\Windows\Temp"),
-                    "回收站" => await GetRecycleBinSizeAsync(),
-                    "Windows 错误报告" => await GetFolderSizeAsync(@"C:\ProgramData\Microsoft\Windows\WER"),
-                    "缩略图缓存" => await GetThumbnailCacheSizeAsync(),
-                    "日志文件" => await GetLogFilesSizeAsync(),
-                    "Windows Update 残留" => await GetFolderSizeAsync(@"C:\Windows\SoftwareDistribution\Download"),
-                    "Windows.old（旧系统文件）" => await GetFolderSizeAsync(@"C:\Windows.old"),
-                    "浏览器缓存（Edge）" => await GetBrowserCacheSizeAsync("Edge"),
-                    "浏览器缓存（Chrome）" => await GetBrowserCacheSizeAsync("Chrome"),
-                    "浏览器缓存（Firefox）" => await GetBrowserCacheSizeAsync("Firefox"),
-                    "DirectX 着色器缓存" => await GetShaderCacheSizeAsync(),
-                    "npm 缓存" => await GetFolderSizeAsync(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm-cache")),
-                    "pip 缓存" => await GetFolderSizeAsync(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"pip\cache")),
-                    "NuGet 缓存" => await GetFolderSizeAsync(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".nuget\packages")),
-                    "Maven 本地仓库" => await GetFolderSizeAsync(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".m2\repository")),
-                    "Gradle 缓存" => await GetFolderSizeAsync(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".gradle\caches")),
-                    "微信缓存" => await GetWeChatCacheSizeAsync(),
-                    "QQ 缓存" => await GetQQCacheSizeAsync(),
-                    "钉钉缓存" => await GetDingTalkCacheSizeAsync(),
-                    "Microsoft Teams 缓存" => await GetTeamsCacheSizeAsync(),
-                    "休眠文件 (hiberfil.sys)" => GetHibernationFileSize(),
-                    "虚拟内存（页面文件）" => GetPageFileSize(),
+                    "UserTemp" => await GetFolderSizeAsync(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\AppData\Local\Temp"),
+                    "SystemTemp" => await GetFolderSizeAsync(@"C:\Windows\Temp"),
+                    "RecycleBin" => await GetRecycleBinSizeAsync(),
+                    "Wer" => await GetFolderSizeAsync(@"C:\ProgramData\Microsoft\Windows\WER"),
+                    "ThumbnailCache" => await GetThumbnailCacheSizeAsync(),
+                    "Logs" => await GetLogFilesSizeAsync(),
+                    "WindowsUpdate" => await GetFolderSizeAsync(@"C:\Windows\SoftwareDistribution\Download"),
+                    "WindowsOld" => await GetFolderSizeAsync(@"C:\Windows.old"),
+                    "BrowserEdge" => await GetBrowserCacheSizeAsync("Edge"),
+                    "BrowserChrome" => await GetBrowserCacheSizeAsync("Chrome"),
+                    "BrowserFirefox" => await GetBrowserCacheSizeAsync("Firefox"),
+                    "ShaderCache" => await GetShaderCacheSizeAsync(),
+                    "Npm" => await GetFolderSizeAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm-cache")),
+                    "Pip" => await GetFolderSizeAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"pip\cache")),
+                    "NuGet" => await GetFolderSizeAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".nuget\packages")),
+                    "Maven" => await GetFolderSizeAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".m2\repository")),
+                    "Gradle" => await GetFolderSizeAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".gradle\caches")),
+                    "WeChat" => await GetWeChatCacheSizeAsync(),
+                    "QQ" => await GetQQCacheSizeAsync(),
+                    "DingTalk" => await GetDingTalkCacheSizeAsync(),
+                    "Teams" => await GetTeamsCacheSizeAsync(),
+                    "Hibernation" => GetHibernationFileSize(),
+                    "PageFile" => GetPageFileSize(),
                     _ => 0
                 };
             }

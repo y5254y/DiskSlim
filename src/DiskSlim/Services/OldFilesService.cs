@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -48,7 +49,7 @@ public class OldFilesService : IOldFilesService
                         var info = new FileInfo(file);
                         if (info.LastAccessTime < cutoffDate && info.Length > 0)
                         {
-                            progress?.Report($"发现旧文件：{info.Name}");
+                            progress?.Report(Localizer.Format("Svc.OldFiles.FoundOld", "发现旧文件：{0}", info.Name));
                             results.Add(new OldFileItem
                             {
                                 FullPath = file,
@@ -93,7 +94,7 @@ public class OldFilesService : IOldFilesService
                         if (TempExtensions.Contains(ext))
                         {
                             var info = new FileInfo(file);
-                            progress?.Report($"发现临时文件：{info.Name}");
+                            progress?.Report(Localizer.Format("Svc.OldFiles.FoundTemp", "发现临时文件：{0}", info.Name));
                             results.Add(new OldFileItem
                             {
                                 FullPath = file,
@@ -139,7 +140,7 @@ public class OldFilesService : IOldFilesService
 
                         if (info.Length == 0)
                         {
-                            progress?.Report($"发现空文件：{info.Name}");
+                            progress?.Report(Localizer.Format("Svc.OldFiles.FoundEmpty", "发现空文件：{0}", info.Name));
                             results.Add(new OldFileItem
                             {
                                 FullPath = file,
@@ -151,7 +152,7 @@ public class OldFilesService : IOldFilesService
                         }
                         else if (ext == ".dmp")
                         {
-                            progress?.Report($"发现转储文件：{info.Name}");
+                            progress?.Report(Localizer.Format("Svc.OldFiles.FoundDump", "发现转储文件：{0}", info.Name));
                             results.Add(new OldFileItem
                             {
                                 FullPath = file,
@@ -192,7 +193,7 @@ public class OldFilesService : IOldFilesService
                 };
                 int result = SHFileOperation(ref fileOp);
                 if (result != 0)
-                    throw new IOException($"SHFileOperation 失败，错误码：{result}");
+                    throw new IOException(Localizer.Format("Svc.OldFiles.ShFileOpFailed", "SHFileOperation 失败，错误码：{0}", result));
             }
             catch (IOException) { throw; }
             catch { }
@@ -245,7 +246,6 @@ public class OldFilesService : IOldFilesService
             token.ThrowIfCancellationRequested();
             string dir = stack.Pop();
 
-            // 跳过系统保护目录
             if (SkipDirectories.Any(skip => dir.StartsWith(skip, StringComparison.OrdinalIgnoreCase)))
                 continue;
 
@@ -271,7 +271,6 @@ public class OldFilesService : IOldFilesService
         }
     }
 
-    // --- Win32 API：Shell 文件操作 ---
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern int SHFileOperation(ref SHFILEOPSTRUCT lpFileOp);
 

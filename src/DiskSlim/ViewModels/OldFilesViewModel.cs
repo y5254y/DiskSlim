@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using DiskSlim.Services;
 using System.Collections.ObjectModel;
@@ -23,7 +24,7 @@ public partial class OldFilesViewModel : ObservableObject
     private bool _isDeleting;
 
     [ObservableProperty]
-    private string _statusMessage = "点击扫描按钮开始检测旧文件或临时文件";
+    private string _statusMessage = Localizer.Get("Vm.OldFiles.ClickScan", "点击扫描按钮开始检测旧文件或临时文件");
 
     [ObservableProperty]
     private bool _hasResults;
@@ -32,7 +33,7 @@ public partial class OldFilesViewModel : ObservableObject
     private int _selectedNotAccessedDays = 90;
 
     [ObservableProperty]
-    private string _selectedScanType = "旧文件";
+    private string _selectedScanType = Localizer.Get("Vm.OldFiles.ScanTypeOld", "旧文件");
 
     [ObservableProperty]
     private long _totalSelectedSize;
@@ -47,7 +48,12 @@ public partial class OldFilesViewModel : ObservableObject
     public List<int> NotAccessedDaysOptions { get; } = [30, 90, 180, 365];
 
     /// <summary>扫描类型选项</summary>
-    public List<string> ScanTypeOptions { get; } = ["旧文件", "临时文件", "空文件和转储"];
+    public List<string> ScanTypeOptions { get; } =
+    [
+        Localizer.Get("Vm.OldFiles.ScanTypeOld", "旧文件"),
+        Localizer.Get("Vm.OldFiles.ScanTypeTemp", "临时文件"),
+        Localizer.Get("Vm.OldFiles.ScanTypeSpecial", "空文件和转储")
+    ];
 
     /// <summary>根路径（默认用户目录）</summary>
     private string RootPath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -68,21 +74,21 @@ public partial class OldFilesViewModel : ObservableObject
         IsScanning = true;
         FileItems.Clear();
         HasResults = false;
-        StatusMessage = "扫描中，请稍候...";
+        StatusMessage = Localizer.Get("Vm.OldFiles.Scanning", "扫描中，请稍候...");
         _cts = new CancellationTokenSource();
 
         try
         {
-            var progress = new Progress<string>(msg => StatusMessage = $"扫描中：{msg}");
+            var progress = new Progress<string>(msg => StatusMessage = Localizer.Format("Vm.OldFiles.ScanningItem", "扫描中：{0}", msg));
             IReadOnlyList<OldFileItem> results;
 
             switch (SelectedScanType)
             {
-                case "旧文件":
+                case var t when t == Localizer.Get("Vm.OldFiles.ScanTypeOld", "旧文件"):
                     results = await _oldFilesService.ScanOldFilesAsync(
                         RootPath, SelectedNotAccessedDays, progress, _cts.Token);
                     break;
-                case "临时文件":
+                case var t when t == Localizer.Get("Vm.OldFiles.ScanTypeTemp", "临时文件"):
                     results = await _oldFilesService.ScanTempFilesAsync(
                         RootPath, progress, _cts.Token);
                     break;
@@ -97,18 +103,18 @@ public partial class OldFilesViewModel : ObservableObject
 
             HasResults = FileItems.Count > 0;
             StatusMessage = HasResults
-                ? $"扫描完成，发现 {FileItems.Count} 个文件"
-                : "未发现符合条件的文件";
+                ? Localizer.Format("Vm.OldFiles.ScanCompleted", "扫描完成，发现 {0} 个文件", FileItems.Count)
+                : Localizer.Get("Vm.OldFiles.NoMatch", "未发现符合条件的文件");
 
             UpdateSelectionStats();
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "扫描已取消";
+            StatusMessage = Localizer.Get("Vm.OldFiles.ScanCanceled", "扫描已取消");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"扫描失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.OldFiles.ScanFailed", "扫描失败：{0}", ex.Message);
         }
         finally
         {
@@ -157,16 +163,16 @@ public partial class OldFilesViewModel : ObservableObject
         var toDelete = FileItems.Where(f => f.IsSelected).Select(f => f.FullPath).ToList();
         if (toDelete.Count == 0)
         {
-            StatusMessage = "请先勾选要删除的文件";
+            StatusMessage = Localizer.Get("Vm.OldFiles.SelectBeforeDelete", "请先勾选要删除的文件");
             return;
         }
 
         IsDeleting = true;
-        StatusMessage = "正在移动到回收站...";
+        StatusMessage = Localizer.Get("Vm.OldFiles.MovingRecycleBin", "正在移动到回收站...");
 
         try
         {
-            var progress = new Progress<string>(name => StatusMessage = $"删除：{name}");
+            var progress = new Progress<string>(name => StatusMessage = Localizer.Format("Vm.OldFiles.DeletingItem", "删除：{0}", name));
             int count = await _oldFilesService.BatchDeleteToRecycleBinAsync(toDelete, progress);
 
             // 从列表中移除已删除的文件
@@ -175,12 +181,12 @@ public partial class OldFilesViewModel : ObservableObject
                 FileItems.Remove(item);
 
             HasResults = FileItems.Count > 0;
-            StatusMessage = $"已将 {count} 个文件移动到回收站";
+            StatusMessage = Localizer.Format("Vm.OldFiles.DeleteCompleted", "已将 {0} 个文件移动到回收站", count);
             UpdateSelectionStats();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"删除失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.OldFiles.DeleteFailed", "删除失败：{0}", ex.Message);
         }
         finally
         {

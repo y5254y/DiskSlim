@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.Services;
 using DiskSlim.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ public partial class App : Application
 
     public App()
     {
+        AppLanguageManager.ApplySavedLanguage();
         this.InitializeComponent();
         Services = ConfigureServices();
     }
@@ -135,7 +137,13 @@ public partial class App : Application
             if (!drive.IsReady) return;
             double freeGb = drive.AvailableFreeSpace / 1_073_741_824.0;
             double totalGb = drive.TotalSize / 1_073_741_824.0;
-            trayService.UpdateTooltip($"DiskSlim\nC盘剩余：{freeGb:F1} GB / {totalGb:F0} GB");
+            var tooltip = Localizer.Format(
+                "Tray.DriveFreeFormat",
+                "DiskSlim\n{0}盘剩余：{1:F1} GB / {2:F0} GB",
+                drive.Name.TrimEnd('\\').TrimEnd(':'),
+                freeGb,
+                totalGb);
+            trayService.UpdateTooltip(tooltip);
         }
         catch
         {

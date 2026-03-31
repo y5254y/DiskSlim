@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using Microsoft.Data.Sqlite;
 using System.Text;
@@ -186,25 +187,25 @@ public class CleanupReportService : ICleanupReportService
     {
         var sb = new StringBuilder();
         sb.AppendLine("========================================");
-        sb.AppendLine("  DiskSlim - C盘瘦身大师  清理报告");
+        sb.AppendLine(Localizer.Get("Svc.CleanupReport.Text.Header", "  DiskSlim - C盘瘦身大师  清理报告"));
         sb.AppendLine("========================================");
-        sb.AppendLine($"清理时间：{report.CompletedAtText}");
-        sb.AppendLine($"清理耗时：{report.DurationText}");
-        sb.AppendLine($"总释放空间：{report.TotalFreedText}");
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Text.Time", "清理时间：{0}", report.CompletedAtText));
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Text.Duration", "清理耗时：{0}", report.DurationText));
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Text.Total", "总释放空间：{0}", report.TotalFreedText));
         sb.AppendLine();
-        sb.AppendLine("清理明细：");
+        sb.AppendLine(Localizer.Get("Svc.CleanupReport.Text.Details", "清理明细："));
         sb.AppendLine("----------------------------------------");
         foreach (var item in report.Items)
         {
             string status = item.Success ? "✓" : "✗";
             sb.AppendLine($"  {status} {item.Name,-30} {item.FreedText,10}");
             if (!item.Success && item.ErrorMessage != null)
-                sb.AppendLine($"     错误：{item.ErrorMessage}");
+                sb.AppendLine(Localizer.Format("Svc.CleanupReport.Text.Error", "     错误：{0}", item.ErrorMessage));
         }
         sb.AppendLine("----------------------------------------");
-        sb.AppendLine($"合计释放：{report.TotalFreedText}");
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Text.TotalLine", "合计释放：{0}", report.TotalFreedText));
         sb.AppendLine();
-        sb.AppendLine("由 DiskSlim - C盘瘦身大师 生成");
+        sb.AppendLine(Localizer.Get("Svc.CleanupReport.Text.Footer", "由 DiskSlim - C盘瘦身大师 生成"));
         return sb.ToString();
     }
 
@@ -215,18 +216,20 @@ public class CleanupReportService : ICleanupReportService
     {
         var sb = new StringBuilder();
         // CSV 标题行
-        sb.AppendLine("清理项目,释放空间(字节),释放空间,状态,错误信息");
+        sb.AppendLine(Localizer.Get("Svc.CleanupReport.Csv.Header", "清理项目,释放空间(字节),释放空间,状态,错误信息"));
         foreach (var item in report.Items)
         {
-            string status = item.Success ? "成功" : "失败";
+            string status = item.Success
+                ? Localizer.Get("Svc.CleanupReport.Csv.Success", "成功")
+                : Localizer.Get("Svc.CleanupReport.Csv.Failed", "失败");
             string error = item.ErrorMessage ?? string.Empty;
             // 对含逗号或引号的字段进行 CSV 转义
             sb.AppendLine($"{CsvEscape(item.Name)},{item.FreedBytes},{CsvEscape(item.FreedText)},{status},{CsvEscape(error)}");
         }
         sb.AppendLine();
-        sb.AppendLine($"总计,,{CsvEscape(report.TotalFreedText)},,");
-        sb.AppendLine($"清理时间,{CsvEscape(report.CompletedAtText)},,,");
-        sb.AppendLine($"耗时,{CsvEscape(report.DurationText)},,,");
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Csv.Total", "总计,,{0},,", CsvEscape(report.TotalFreedText)));
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Csv.Time", "清理时间,{0},,,", CsvEscape(report.CompletedAtText)));
+        sb.AppendLine(Localizer.Format("Svc.CleanupReport.Csv.Duration", "耗时,{0},,,", CsvEscape(report.DurationText)));
         return sb.ToString();
     }
 
@@ -261,10 +264,10 @@ public class CleanupReportService : ICleanupReportService
 
         return $$"""
             <!DOCTYPE html>
-            <html lang="zh-CN">
+            <html lang="{{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.Lang", "zh-CN"))}}">
             <head>
               <meta charset="UTF-8"/>
-              <title>DiskSlim 清理报告</title>
+              <title>{{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.Title", "DiskSlim 清理报告"))}}</title>
               <style>
                 body { font-family: "Microsoft YaHei", sans-serif; padding: 24px; background: #f5f5f5; }
                 h1 { color: #0078d4; }
@@ -276,21 +279,25 @@ public class CleanupReportService : ICleanupReportService
               </style>
             </head>
             <body>
-              <h1>🧹 DiskSlim 清理报告</h1>
+              <h1>🧹 {{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.H1", "DiskSlim 清理报告"))}}</h1>
               <p class="meta">
-                清理时间：{{System.Net.WebUtility.HtmlEncode(report.CompletedAtText)}}&nbsp;&nbsp;
-                耗时：{{System.Net.WebUtility.HtmlEncode(report.DurationText)}}
+                {{System.Net.WebUtility.HtmlEncode(Localizer.Format("Svc.CleanupReport.Html.Time", "清理时间：{0}", report.CompletedAtText))}}&nbsp;&nbsp;
+                {{System.Net.WebUtility.HtmlEncode(Localizer.Format("Svc.CleanupReport.Html.Duration", "耗时：{0}", report.DurationText))}}
               </p>
               <table>
                 <thead>
-                  <tr><th>清理项目</th><th>释放空间</th><th>状态</th></tr>
+                  <tr>
+                    <th>{{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.ColItem", "清理项目"))}}</th>
+                    <th>{{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.ColFreed", "释放空间"))}}</th>
+                    <th>{{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.ColStatus", "状态"))}}</th>
+                  </tr>
                 </thead>
                 <tbody>
             {{rows}}
                 </tbody>
               </table>
-              <p class="total">总共释放：{{System.Net.WebUtility.HtmlEncode(report.TotalFreedText)}}</p>
-              <p style="color:#aaa;font-size:.85em">由 DiskSlim - C盘瘦身大师 生成</p>
+              <p class="total">{{System.Net.WebUtility.HtmlEncode(Localizer.Format("Svc.CleanupReport.Html.Total", "总共释放：{0}", report.TotalFreedText))}}</p>
+              <p style="color:#aaa;font-size:.85em">{{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.CleanupReport.Html.Footer", "由 DiskSlim - C盘瘦身大师 生成"))}}</p>
             </body>
             </html>
             """;

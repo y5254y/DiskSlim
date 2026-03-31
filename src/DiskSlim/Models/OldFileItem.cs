@@ -1,3 +1,5 @@
+using DiskSlim.Helpers;
+
 namespace DiskSlim.Models;
 
 /// <summary>
@@ -39,16 +41,16 @@ public class OldFileItem
     public int DaysSinceAccess => (int)(DateTime.Now - LastAccessed).TotalDays;
 
     /// <summary>未访问天数文字</summary>
-    public string DaysSinceAccessText => $"{DaysSinceAccess} 天未访问";
+    public string DaysSinceAccessText => Localizer.Format("Model.OldFileItem.DaysSinceAccess", "{0} 天未访问", DaysSinceAccess);
 
     /// <summary>文件类型显示名称</summary>
     public string FileTypeName => FileType switch
     {
-        OldFileType.OldFile => "旧文件",
-        OldFileType.TempFile => "临时文件",
-        OldFileType.EmptyFile => "空文件",
-        OldFileType.DumpFile => "崩溃转储",
-        _ => "其他"
+        OldFileType.OldFile => Localizer.Get("Model.OldFileItem.Type.Old", "旧文件"),
+        OldFileType.TempFile => Localizer.Get("Model.OldFileItem.Type.Temp", "临时文件"),
+        OldFileType.EmptyFile => Localizer.Get("Model.OldFileItem.Type.Empty", "空文件"),
+        OldFileType.DumpFile => Localizer.Get("Model.OldFileItem.Type.Dump", "崩溃转储"),
+        _ => Localizer.Get("Model.OldFileItem.Type.Other", "其他")
     };
 }
 

@@ -25,7 +25,7 @@ public partial class WslViewModel : ObservableObject
     private bool _isWslInstalled;
 
     [ObservableProperty]
-    private string _statusMessage = "点击"扫描"检测 WSL 发行版";
+    private string _statusMessage = Localizer.Get("Vm.Wsl.ClickScan", "点击【扫描】检测 WSL 发行版");
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasOutputLog))]
@@ -61,7 +61,7 @@ public partial class WslViewModel : ObservableObject
     public async Task ScanAsync()
     {
         IsLoading = true;
-        StatusMessage = "正在扫描 WSL 发行版…";
+        StatusMessage = Localizer.Get("Vm.Wsl.Scanning", "正在扫描 WSL 发行版…");
         Distributions.Clear();
         OutputLog = string.Empty;
 
@@ -71,7 +71,7 @@ public partial class WslViewModel : ObservableObject
 
             if (!IsWslInstalled)
             {
-                StatusMessage = "未检测到 WSL，请先安装 Windows Subsystem for Linux";
+                StatusMessage = Localizer.Get("Vm.Wsl.NotInstalled", "未检测到 WSL，请先安装 Windows Subsystem for Linux");
                 return;
             }
 
@@ -82,17 +82,17 @@ public partial class WslViewModel : ObservableObject
 
             if (Distributions.Count == 0)
             {
-                StatusMessage = "未找到任何 WSL 发行版";
+                StatusMessage = Localizer.Get("Vm.Wsl.NoDistribution", "未找到任何 WSL 发行版");
             }
             else
             {
                 long totalVhdx = Distributions.Sum(d => d.VhdxSizeBytes);
-                StatusMessage = $"找到 {Distributions.Count} 个发行版，虚拟磁盘总计 {FileSizeHelper.Format(totalVhdx)}";
+                StatusMessage = Localizer.Format("Vm.Wsl.ScanCompleted", "找到 {0} 个发行版，虚拟磁盘总计 {1}", Distributions.Count, FileSizeHelper.Format(totalVhdx));
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"扫描出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Wsl.ScanError", "扫描出错：{0}", ex.Message);
         }
         finally
         {
@@ -106,7 +106,7 @@ public partial class WslViewModel : ObservableObject
     {
         IsReclaiming = true;
         OutputLog = string.Empty;
-        StatusMessage = $"正在处理 {distribution.Name}，请勿关闭窗口…";
+        StatusMessage = Localizer.Format("Vm.Wsl.Processing", "正在处理 {0}，请勿关闭窗口…", distribution.Name);
 
         var progress = new Progress<string>(msg =>
         {
@@ -124,21 +124,21 @@ public partial class WslViewModel : ObservableObject
             {
                 TotalSavedBytes += result.SavedBytes;
                 StatusMessage = result.SavedBytes > 0
-                    ? $"✅ {distribution.Name} 完成！释放了 {FileSizeHelper.Format(result.SavedBytes)}"
-                    : $"✅ {distribution.Name} 压缩完成（空间已是最优）";
+                    ? Localizer.Format("Vm.Wsl.ReclaimDoneWithSave", "✅ {0} 完成！释放了 {1}", distribution.Name, FileSizeHelper.Format(result.SavedBytes))
+                    : Localizer.Format("Vm.Wsl.ReclaimDoneNoSave", "✅ {0} 压缩完成（空间已是最优）", distribution.Name);
 
                 // 更新列表中该发行版的 vhdx 大小
                 distribution.VhdxSizeBytes = result.SizeAfterBytes;
             }
             else
             {
-                StatusMessage = $"❌ {distribution.Name} 失败：{result.ErrorMessage}";
-                OutputLog += $"\n错误：{result.ErrorMessage}";
+                StatusMessage = Localizer.Format("Vm.Wsl.ReclaimFailed", "❌ {0} 失败：{1}", distribution.Name, result.ErrorMessage);
+                OutputLog += Environment.NewLine + Localizer.Format("Vm.Wsl.ErrorPrefix", "错误：{0}", result.ErrorMessage);
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"处理出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Wsl.ProcessError", "处理出错：{0}", ex.Message);
         }
         finally
         {
@@ -177,12 +177,12 @@ public partial class WslViewModel : ObservableObject
             }
 
             StatusMessage = TotalSavedBytes > 0
-                ? $"✅ 全部完成！共释放 {FileSizeHelper.Format(TotalSavedBytes)}"
-                : "✅ 全部压缩完成（空间已是最优）";
+                ? Localizer.Format("Vm.Wsl.ReclaimAllDoneWithSave", "✅ 全部完成！共释放 {0}", FileSizeHelper.Format(TotalSavedBytes))
+                : Localizer.Get("Vm.Wsl.ReclaimAllDoneNoSave", "✅ 全部压缩完成（空间已是最优）");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"处理出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Wsl.ProcessError", "处理出错：{0}", ex.Message);
         }
         finally
         {

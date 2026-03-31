@@ -26,7 +26,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock Text="历史快照" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock x:Uid="SnapshotPageTitle" Text="历史快照" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -34,6 +34,7 @@
 
             <!-- 快照备注输入框 -->
             <TextBox Grid.Column="1" Width="200"
+                     x:Uid="SnapshotPageNoteTextBox"
                      PlaceholderText="快照备注（可选）"
                      Text="{x:Bind ViewModel.NewSnapshotLabel, Mode=TwoWay}"
                      VerticalAlignment="Center"/>
@@ -48,7 +49,7 @@
                                   Visibility="{x:Bind ViewModel.IsCreating, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     <FontIcon Glyph="&#xEA35;" FontSize="14"
                               Visibility="{x:Bind ViewModel.IsCreating, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                    <TextBlock Text="新建快照"/>
+                    <TextBlock x:Uid="SnapshotPageCreateText" Text="新建快照"/>
                 </StackPanel>
             </Button>
 
@@ -58,7 +59,7 @@
                     Visibility="{x:Bind ViewModel.HasSnapshots, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <FontIcon Glyph="&#xE74D;" FontSize="14"/>
-                    <TextBlock Text="删除选中"/>
+                    <TextBlock x:Uid="SnapshotPageDeleteSelectedText" Text="删除选中"/>
                 </StackPanel>
             </Button>
         </Grid>
@@ -115,9 +116,9 @@
                             Visibility="{x:Bind ViewModel.HasSnapshots, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                     <FontIcon Glyph="&#xEA35;" FontSize="36"
                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <TextBlock Text="暂无快照" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    <TextBlock x:Uid="SnapshotPageEmptyTitle" Text="暂无快照" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="点击【新建快照】保存当前状态"
+                    <TextBlock x:Uid="SnapshotPageEmptyDescription" Text="点击【新建快照】保存当前状态"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                HorizontalAlignment="Center"/>
@@ -135,7 +136,7 @@
                     <!-- 选中快照详情 -->
                     <StackPanel Spacing="12"
                                 Visibility="{x:Bind ViewModel.SelectedSnapshot, Mode=OneWay, Converter={StaticResource NullToInvisibilityConverter}}">
-                        <TextBlock Text="快照详情" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock x:Uid="SnapshotPageDetailTitle" Text="快照详情" Style="{StaticResource BodyStrongTextBlockStyle}"/>
 
                         <Grid ColumnSpacing="16">
                             <Grid.ColumnDefinitions>
@@ -148,7 +149,7 @@
                             <Border Grid.Column="0" Padding="16,12" CornerRadius="8"
                                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                                 <StackPanel>
-                                    <TextBlock Text="总大小" Style="{StaticResource CaptionTextBlockStyle}"
+                                    <TextBlock x:Uid="SnapshotPageTotalSizeLabel" Text="总大小" Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     <TextBlock Text="{x:Bind ViewModel.SelectedSnapshot.TotalBytesText, Mode=OneWay}"
                                                Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="Bold"/>
@@ -159,7 +160,7 @@
                             <Border Grid.Column="1" Padding="16,12" CornerRadius="8"
                                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                                 <StackPanel>
-                                    <TextBlock Text="已用空间" Style="{StaticResource CaptionTextBlockStyle}"
+                                    <TextBlock x:Uid="SnapshotPageUsedSizeLabel" Text="已用空间" Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     <TextBlock Text="{x:Bind ViewModel.SelectedSnapshot.UsedBytesText, Mode=OneWay}"
                                                Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="Bold"
@@ -171,7 +172,7 @@
                             <Border Grid.Column="2" Padding="16,12" CornerRadius="8"
                                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                                 <StackPanel>
-                                    <TextBlock Text="可用空间" Style="{StaticResource CaptionTextBlockStyle}"
+                                    <TextBlock x:Uid="SnapshotPageFreeSizeLabel" Text="可用空间" Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     <TextBlock Text="{x:Bind ViewModel.SelectedSnapshot.FreeBytesText, Mode=OneWay}"
                                                Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="Bold"
@@ -181,7 +182,7 @@
                         </Grid>
 
                         <!-- 文件夹明细 -->
-                        <TextBlock Text="文件夹明细（按大小排序）"
+                        <TextBlock x:Uid="SnapshotPageFolderListTitle" Text="文件夹明细（按大小排序）"
                                    Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <ListView
@@ -213,7 +214,7 @@
                     <!-- 快照对比区域 -->
                     <StackPanel Spacing="12"
                                 Visibility="{x:Bind ViewModel.HasSnapshots, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="📊 快照对比" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock x:Uid="SnapshotPageCompareTitle" Text="📊 快照对比" Style="{StaticResource BodyStrongTextBlockStyle}"/>
 
                         <Grid ColumnSpacing="12">
                             <Grid.ColumnDefinitions>
@@ -227,6 +228,7 @@
                                       ItemsSource="{x:Bind ViewModel.Snapshots, Mode=OneWay}"
                                       SelectedItem="{x:Bind ViewModel.CompareSnapshot1, Mode=TwoWay}"
                                       HorizontalAlignment="Stretch"
+                                      x:Uid="SnapshotPageOldSnapshotCombo"
                                       PlaceholderText="选择旧快照">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate x:DataType="models:DiskSnapshot">
@@ -235,13 +237,14 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
 
-                            <TextBlock Grid.Column="1" Text="→" VerticalAlignment="Center"
+                            <TextBlock Grid.Column="1" x:Uid="SnapshotPageCompareArrow" Text="→" VerticalAlignment="Center"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
                             <ComboBox Grid.Column="2"
                                       ItemsSource="{x:Bind ViewModel.Snapshots, Mode=OneWay}"
                                       SelectedItem="{x:Bind ViewModel.CompareSnapshot2, Mode=TwoWay}"
                                       HorizontalAlignment="Stretch"
+                                      x:Uid="SnapshotPageNewSnapshotCombo"
                                       PlaceholderText="选择新快照">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate x:DataType="models:DiskSnapshot">
@@ -257,7 +260,7 @@
                                     <ProgressRing Width="14" Height="14"
                                                   IsActive="{x:Bind ViewModel.IsComparing, Mode=OneWay}"
                                                   Visibility="{x:Bind ViewModel.IsComparing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                    <TextBlock Text="开始对比"/>
+                                    <TextBlock x:Uid="SnapshotPageCompareText" Text="开始对比"/>
                                 </StackPanel>
                             </Button>
                         </Grid>
@@ -281,15 +284,15 @@
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="100"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="文件夹" FontWeight="SemiBold"
+                                    <TextBlock Grid.Column="0" x:Uid="SnapshotPageDiffHeaderFolder" Text="文件夹" FontWeight="SemiBold"
                                                Style="{StaticResource CaptionTextBlockStyle}"/>
-                                    <TextBlock Grid.Column="1" Text="旧大小" FontWeight="SemiBold"
+                                    <TextBlock Grid.Column="1" x:Uid="SnapshotPageDiffHeaderOld" Text="旧大小" FontWeight="SemiBold"
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                HorizontalAlignment="Right"/>
-                                    <TextBlock Grid.Column="2" Text="新大小" FontWeight="SemiBold"
+                                    <TextBlock Grid.Column="2" x:Uid="SnapshotPageDiffHeaderNew" Text="新大小" FontWeight="SemiBold"
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                HorizontalAlignment="Right"/>
-                                    <TextBlock Grid.Column="3" Text="变化量" FontWeight="SemiBold"
+                                    <TextBlock Grid.Column="3" x:Uid="SnapshotPageDiffHeaderDelta" Text="变化量" FontWeight="SemiBold"
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                HorizontalAlignment="Right"/>
                                 </Grid>
@@ -323,7 +326,7 @@
                                 Visibility="{x:Bind ViewModel.SelectedSnapshot, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
                         <FontIcon Glyph="&#xEA35;" FontSize="48"
                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Text="从左侧选择一个快照查看详情"
+                        <TextBlock x:Uid="SnapshotPagePlaceholderText" Text="从左侧选择一个快照查看详情"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    HorizontalAlignment="Center"/>
                     </StackPanel>
@@ -333,3 +336,4 @@
         </Grid>
     </Grid>
 </Page>
+

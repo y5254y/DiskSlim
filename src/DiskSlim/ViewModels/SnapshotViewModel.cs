@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using DiskSlim.Services;
 using System.Collections.ObjectModel;
@@ -39,7 +40,7 @@ public partial class SnapshotViewModel : ObservableObject
     private bool _isComparing;
 
     [ObservableProperty]
-    private string _statusMessage = "加载快照中...";
+    private string _statusMessage = Localizer.Get("Vm.Snapshot.Loading", "加载快照中...");
 
     [ObservableProperty]
     private string _newSnapshotLabel = string.Empty;
@@ -82,14 +83,16 @@ public partial class SnapshotViewModel : ObservableObject
                 Snapshots.Add(s);
 
             HasSnapshots = Snapshots.Count > 0;
-            StatusMessage = HasSnapshots ? $"共 {Snapshots.Count} 个快照" : "暂无快照，点击【新建快照】保存当前状态";
+            StatusMessage = HasSnapshots
+                ? Localizer.Format("Vm.Snapshot.Count", "共 {0} 个快照", Snapshots.Count)
+                : Localizer.Get("Vm.Snapshot.Empty", "暂无快照，点击【新建快照】保存当前状态");
 
             if (HasSnapshots && SelectedSnapshot == null)
                 SelectedSnapshot = Snapshots[0];
         }
         catch (Exception ex)
         {
-            StatusMessage = $"加载失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Snapshot.LoadFailed", "加载失败：{0}", ex.Message);
         }
         finally
         {
@@ -104,7 +107,7 @@ public partial class SnapshotViewModel : ObservableObject
     public async Task CreateSnapshotAsync()
     {
         IsCreating = true;
-        StatusMessage = "正在创建快照...";
+        StatusMessage = Localizer.Get("Vm.Snapshot.Creating", "正在创建快照...");
         _cts = new CancellationTokenSource();
 
         try
@@ -117,15 +120,15 @@ public partial class SnapshotViewModel : ObservableObject
             HasSnapshots = true;
             SelectedSnapshot = snapshot;
             NewSnapshotLabel = string.Empty;
-            StatusMessage = $"快照已保存：{snapshot.SnapshotTimeText}（已用 {snapshot.UsedBytesText}）";
+            StatusMessage = Localizer.Format("Vm.Snapshot.Created", "快照已保存：{0}（已用 {1}）", snapshot.SnapshotTimeText, snapshot.UsedBytesText);
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "快照创建已取消";
+            StatusMessage = Localizer.Get("Vm.Snapshot.CreateCanceled", "快照创建已取消");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"创建快照失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Snapshot.CreateFailed", "创建快照失败：{0}", ex.Message);
         }
         finally
         {
@@ -149,11 +152,11 @@ public partial class SnapshotViewModel : ObservableObject
             Snapshots.Remove(SelectedSnapshot);
             HasSnapshots = Snapshots.Count > 0;
             SelectedSnapshot = HasSnapshots ? Snapshots[0] : null;
-            StatusMessage = $"快照已删除，共 {Snapshots.Count} 个快照";
+            StatusMessage = Localizer.Format("Vm.Snapshot.Deleted", "快照已删除，共 {0} 个快照", Snapshots.Count);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"删除失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Snapshot.DeleteFailed", "删除失败：{0}", ex.Message);
         }
     }
 
@@ -165,18 +168,18 @@ public partial class SnapshotViewModel : ObservableObject
     {
         if (CompareSnapshot1 == null || CompareSnapshot2 == null)
         {
-            StatusMessage = "请先选择两个快照进行对比";
+            StatusMessage = Localizer.Get("Vm.Snapshot.SelectTwo", "请先选择两个快照进行对比");
             return;
         }
 
         if (CompareSnapshot1.Id == CompareSnapshot2.Id)
         {
-            StatusMessage = "请选择不同的两个快照";
+            StatusMessage = Localizer.Get("Vm.Snapshot.SelectDifferent", "请选择不同的两个快照");
             return;
         }
 
         IsComparing = true;
-        StatusMessage = "正在对比快照...";
+        StatusMessage = Localizer.Get("Vm.Snapshot.Comparing", "正在对比快照...");
 
         try
         {
@@ -198,13 +201,12 @@ public partial class SnapshotViewModel : ObservableObject
             string deltaPrefix = DiskDeltaBytes >= 0 ? "+" : "-";
             DiskDeltaText = $"{deltaPrefix}{Helpers.FileSizeHelper.Format(Math.Abs(DiskDeltaBytes))}";
 
-            StatusMessage = $"对比完成：{oldSnap.SnapshotTimeText} → {newSnap.SnapshotTimeText}，" +
-                            $"磁盘变化 {DiskDeltaText}";
-            DiffSummary = $"新快照磁盘已用：{newSnap.UsedBytesText}，旧快照：{oldSnap.UsedBytesText}，变化：{DiskDeltaText}";
+            StatusMessage = Localizer.Format("Vm.Snapshot.CompareDone", "对比完成：{0} → {1}，磁盘变化 {2}", oldSnap.SnapshotTimeText, newSnap.SnapshotTimeText, DiskDeltaText);
+            DiffSummary = Localizer.Format("Vm.Snapshot.CompareSummary", "新快照磁盘已用：{0}，旧快照：{1}，变化：{2}", newSnap.UsedBytesText, oldSnap.UsedBytesText, DiskDeltaText);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"对比失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Snapshot.CompareFailed", "对比失败：{0}", ex.Message);
         }
         finally
         {

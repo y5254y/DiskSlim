@@ -47,7 +47,7 @@ public partial class MigrationViewModel : ObservableObject
     private double _migrationProgress;
 
     [ObservableProperty]
-    private string _statusMessage = "选择要迁移的文件夹和目标盘";
+    private string _statusMessage = Localizer.Get("Vm.Migration.SelectFolderAndDrive", "选择要迁移的文件夹和目标盘");
 
     [ObservableProperty]
     private string _currentFile = string.Empty;
@@ -160,7 +160,7 @@ public partial class MigrationViewModel : ObservableObject
         if (string.IsNullOrEmpty(DestinationDrive))
         {
             HasSpaceError = true;
-            SpaceErrorMessage = "请先选择目标盘符";
+            SpaceErrorMessage = Localizer.Get("Vm.Migration.SelectTargetDrive", "请先选择目标盘符");
             return;
         }
 
@@ -168,7 +168,7 @@ public partial class MigrationViewModel : ObservableObject
         if (!DriveInfo.GetDrives().Any(d => d.Name.StartsWith(DestinationDrive, StringComparison.OrdinalIgnoreCase)))
         {
             HasSpaceError = true;
-            SpaceErrorMessage = $"目标盘 {DestinationDrive} 不存在，请选择其他盘符";
+            SpaceErrorMessage = Localizer.Format("Vm.Migration.TargetDriveNotFound", "目标盘 {0} 不存在，请选择其他盘符", DestinationDrive);
             return;
         }
 
@@ -178,7 +178,7 @@ public partial class MigrationViewModel : ObservableObject
         if (!hasSpace)
         {
             HasSpaceError = true;
-            SpaceErrorMessage = $"目标盘 {DestinationDrive} 空间不足，请选择其他盘符";
+            SpaceErrorMessage = Localizer.Format("Vm.Migration.NoSpace", "目标盘 {0} 空间不足，请选择其他盘符", DestinationDrive);
         }
     }
 
@@ -192,7 +192,7 @@ public partial class MigrationViewModel : ObservableObject
 
         if (string.IsNullOrEmpty(DestinationDrive))
         {
-            StatusMessage = "请先选择目标盘符";
+            StatusMessage = Localizer.Get("Vm.Migration.SelectTargetDrive", "请先选择目标盘符");
             return;
         }
 
@@ -229,18 +229,18 @@ public partial class MigrationViewModel : ObservableObject
 
             await _migrationService.ExecuteMigrationAsync(task, progress, _cts.Token);
             MigrationProgress = 100;
-            StatusMessage = $"迁移完成！{SelectedFolder.DisplayName} 已迁移到 {DestinationPath}";
+            StatusMessage = Localizer.Format("Vm.Migration.Completed", "迁移完成！{0} 已迁移到 {1}", SelectedFolder.DisplayName, DestinationPath);
             MigrationHistory.Insert(0, task);
             DestinationPath = string.Empty; // 清空路径，供下次使用
             LoadFolders(); // 刷新状态
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "迁移已取消";
+            StatusMessage = Localizer.Get("Vm.Migration.Canceled", "迁移已取消");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"迁移失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Migration.Failed", "迁移失败：{0}", ex.Message);
         }
         finally
         {
@@ -268,12 +268,12 @@ public partial class MigrationViewModel : ObservableObject
         try
         {
             await _migrationService.RollbackMigrationAsync(task);
-            StatusMessage = $"已回退迁移：{task.Name}";
+            StatusMessage = Localizer.Format("Vm.Migration.RollbackDone", "已回退迁移：{0}", task.Name);
             LoadFolders();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"回退失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Migration.RollbackFailed", "回退失败：{0}", ex.Message);
         }
     }
 }

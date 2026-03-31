@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using Microsoft.Win32;
 
@@ -25,7 +26,7 @@ public class MigrationService : IMigrationService
         {
             new UserFolderInfo
             {
-                DisplayName = "桌面",
+                DisplayName = Localizer.Get("Svc.Migration.Folder.Desktop", "桌面"),
                 CurrentPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 RegistryKey = "Desktop",
                 IconGlyph = "\uE8FC",
@@ -33,7 +34,7 @@ public class MigrationService : IMigrationService
             },
             new UserFolderInfo
             {
-                DisplayName = "文档",
+                DisplayName = Localizer.Get("Svc.Migration.Folder.Documents", "文档"),
                 CurrentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 RegistryKey = "Personal",
                 IconGlyph = "\uE8A5",
@@ -41,7 +42,7 @@ public class MigrationService : IMigrationService
             },
             new UserFolderInfo
             {
-                DisplayName = "下载",
+                DisplayName = Localizer.Get("Svc.Migration.Folder.Downloads", "下载"),
                 CurrentPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
                 RegistryKey = "{374DE290-123F-4565-9164-39C4925E467B}",
                 IconGlyph = "\uE896",
@@ -50,7 +51,7 @@ public class MigrationService : IMigrationService
             },
             new UserFolderInfo
             {
-                DisplayName = "图片",
+                DisplayName = Localizer.Get("Svc.Migration.Folder.Pictures", "图片"),
                 CurrentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
                 RegistryKey = "My Pictures",
                 IconGlyph = "\uEB9F",
@@ -58,7 +59,7 @@ public class MigrationService : IMigrationService
             },
             new UserFolderInfo
             {
-                DisplayName = "视频",
+                DisplayName = Localizer.Get("Svc.Migration.Folder.Videos", "视频"),
                 CurrentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
                 RegistryKey = "My Video",
                 IconGlyph = "\uE8B2",
@@ -66,7 +67,7 @@ public class MigrationService : IMigrationService
             },
             new UserFolderInfo
             {
-                DisplayName = "音乐",
+                DisplayName = Localizer.Get("Svc.Migration.Folder.Music", "音乐"),
                 CurrentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
                 RegistryKey = "My Music",
                 IconGlyph = "\uEC4F",
@@ -88,7 +89,7 @@ public class MigrationService : IMigrationService
         try
         {
             // 阶段1：计算源文件夹大小
-            progress?.Report(new MigrationProgress("正在计算文件夹大小...", 0, 0, string.Empty));
+            progress?.Report(new MigrationProgress(Localizer.Get("Svc.Migration.StageCalcSize", "正在计算文件夹大小..."), 0, 0, string.Empty));
             task.TotalSizeBytes = await CalculateFolderSizeAsync(task.SourcePath, cancellationToken);
 
             // 阶段2：确保目标目录存在
@@ -104,24 +105,24 @@ public class MigrationService : IMigrationService
                 {
                     copied += p.bytes;
                     task.TransferredBytes = copied;
-                    progress?.Report(new MigrationProgress("正在复制文件...", copied, task.TotalSizeBytes, p.file));
+                    progress?.Report(new MigrationProgress(Localizer.Get("Svc.Migration.StageCopy", "正在复制文件..."), copied, task.TotalSizeBytes, p.file));
                 }),
                 cancellationToken);
 
             // 阶段4：删除源目录（该步骤可能耗时）
-            progress?.Report(new MigrationProgress("正在删除原目录...", copied, task.TotalSizeBytes, string.Empty));
+            progress?.Report(new MigrationProgress(Localizer.Get("Svc.Migration.StageDeleteSource", "正在删除原目录..."), copied, task.TotalSizeBytes, string.Empty));
             await DeleteSourceDirectoryAsync(task.SourcePath, cancellationToken);
 
             // 阶段5：创建 Junction 链接
-            progress?.Report(new MigrationProgress("正在创建符号链接...", copied, task.TotalSizeBytes, string.Empty));
+            progress?.Report(new MigrationProgress(Localizer.Get("Svc.Migration.StageCreateLink", "正在创建符号链接..."), copied, task.TotalSizeBytes, string.Empty));
             bool junctionCreated = await _symlinkService.CreateJunctionAsync(task.SourcePath, task.DestinationPath);
             if (!junctionCreated)
-                throw new InvalidOperationException("创建符号链接失败，请以管理员身份运行后重试");
+                throw new InvalidOperationException(Localizer.Get("Svc.Migration.CreateLinkFailed", "创建符号链接失败，请以管理员身份运行后重试"));
 
             task.HasSymlink = true;
 
             // 阶段6：更新注册表（可选，Junction 方式不强制更新）
-            progress?.Report(new MigrationProgress("正在更新系统配置...", copied, task.TotalSizeBytes, string.Empty));
+            progress?.Report(new MigrationProgress(Localizer.Get("Svc.Migration.StageUpdateConfig", "正在更新系统配置..."), copied, task.TotalSizeBytes, string.Empty));
 
             task.Status = MigrationStatus.Completed;
             task.CompletedAt = DateTime.Now;
@@ -129,7 +130,7 @@ public class MigrationService : IMigrationService
         catch (OperationCanceledException)
         {
             task.Status = MigrationStatus.Failed;
-            task.ErrorMessage = "用户取消了迁移操作";
+            task.ErrorMessage = Localizer.Get("Svc.Migration.Canceled", "用户取消了迁移操作");
             throw;
         }
         catch (Exception ex)
@@ -206,7 +207,7 @@ public class MigrationService : IMigrationService
                         }
                         catch (Exception ex)
                         {
-                            throw new IOException($"无法删除文件：{file}。请关闭占用该文件的程序后重试。", ex);
+                            throw new IOException(Localizer.Format("Svc.Migration.DeleteFileFailed", "无法删除文件：{0}。请关闭占用该文件的程序后重试。", file), ex);
                         }
                     }
                 }
@@ -216,7 +217,7 @@ public class MigrationService : IMigrationService
                 }
                 catch (Exception ex) when (ex is not IOException)
                 {
-                    throw new IOException($"无法访问目录：{current}", ex);
+                    throw new IOException(Localizer.Format("Svc.Migration.AccessDirFailed", "无法访问目录：{0}", current), ex);
                 }
 
                 try
@@ -231,7 +232,7 @@ public class MigrationService : IMigrationService
                         }
                         catch (Exception ex)
                         {
-                            throw new IOException($"无法读取目录属性：{dir}", ex);
+                            throw new IOException(Localizer.Format("Svc.Migration.ReadDirAttrFailed", "无法读取目录属性：{0}", dir), ex);
                         }
 
                         if ((attr & FileAttributes.ReparsePoint) != 0)
@@ -242,7 +243,7 @@ public class MigrationService : IMigrationService
                             }
                             catch (Exception ex)
                             {
-                                throw new IOException($"无法删除重解析点目录：{dir}", ex);
+                                throw new IOException(Localizer.Format("Svc.Migration.DeleteReparseFailed", "无法删除重解析点目录：{0}", dir), ex);
                             }
                             continue;
                         }
@@ -256,7 +257,7 @@ public class MigrationService : IMigrationService
                 }
                 catch (Exception ex) when (ex is not IOException)
                 {
-                    throw new IOException($"无法枚举子目录：{current}", ex);
+                    throw new IOException(Localizer.Format("Svc.Migration.EnumSubDirFailed", "无法枚举子目录：{0}", current), ex);
                 }
             }
 
@@ -269,7 +270,7 @@ public class MigrationService : IMigrationService
                 }
                 catch (Exception ex)
                 {
-                    throw new IOException($"无法删除目录：{visitedDirs[i]}", ex);
+                    throw new IOException(Localizer.Format("Svc.Migration.DeleteDirFailed", "无法删除目录：{0}", visitedDirs[i]), ex);
                 }
             }
         }, ct);

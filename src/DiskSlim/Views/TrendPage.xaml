@@ -21,7 +21,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="📈 空间增长趋势分析"
+                    <TextBlock x:Uid="TrendPageTitle" Text="📈 空间增长趋势分析"
                                Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
                                Style="{StaticResource CaptionTextBlockStyle}"
@@ -29,7 +29,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock Text="时间范围：" VerticalAlignment="Center"
+                    <TextBlock x:Uid="TrendPageTimeRangeLabel" Text="时间范围：" VerticalAlignment="Center"
                                Style="{StaticResource CaptionTextBlockStyle}"/>
                     <ComboBox ItemsSource="{x:Bind ViewModel.TimeRanges}"
                               SelectedItem="{x:Bind ViewModel.SelectedTimeRange, Mode=TwoWay}"
@@ -54,7 +54,7 @@
                 <Border Grid.Column="0" Padding="16,12" CornerRadius="8"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                     <StackPanel>
-                        <TextBlock Text="最小已用空间" Style="{StaticResource CaptionTextBlockStyle}"
+                        <TextBlock x:Uid="TrendPageMinUsedLabel" Text="最小已用空间" Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock Text="{x:Bind ViewModel.MinValueText, Mode=OneWay}"
                                    Style="{StaticResource TitleTextBlockStyle}" FontWeight="Bold"/>
@@ -64,7 +64,7 @@
                 <Border Grid.Column="1" Padding="16,12" CornerRadius="8"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                     <StackPanel>
-                        <TextBlock Text="最大已用空间" Style="{StaticResource CaptionTextBlockStyle}"
+                        <TextBlock x:Uid="TrendPageMaxUsedLabel" Text="最大已用空间" Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock Text="{x:Bind ViewModel.MaxValueText, Mode=OneWay}"
                                    Style="{StaticResource TitleTextBlockStyle}" FontWeight="Bold"/>
@@ -74,7 +74,7 @@
                 <Border Grid.Column="2" Padding="16,12" CornerRadius="8"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                     <StackPanel>
-                        <TextBlock Text="当前已用空间" Style="{StaticResource CaptionTextBlockStyle}"
+                        <TextBlock x:Uid="TrendPageCurrentUsedLabel" Text="当前已用空间" Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock Text="{x:Bind ViewModel.LatestValueText, Mode=OneWay}"
                                    Style="{StaticResource TitleTextBlockStyle}" FontWeight="Bold"
@@ -85,7 +85,7 @@
                 <Border Grid.Column="3" Padding="16,12" CornerRadius="8"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                     <StackPanel>
-                        <TextBlock Text="平均增长速率" Style="{StaticResource CaptionTextBlockStyle}"
+                        <TextBlock x:Uid="TrendPageGrowthRateLabel" Text="平均增长速率" Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <TextBlock Text="{x:Bind ViewModel.GrowthRateText, Mode=OneWay}"
                                    Style="{StaticResource TitleTextBlockStyle}" FontWeight="Bold"
@@ -99,7 +99,7 @@
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     Visibility="{x:Bind ViewModel.HasData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="空间使用趋势" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                    <TextBlock x:Uid="TrendPageChartTitle" Text="空间使用趋势" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                     <!-- 自定义图表 Canvas，在 code-behind 中绘制 -->
                     <Canvas x:Name="TrendCanvas" Height="200" HorizontalAlignment="Stretch"/>
                     <!-- 时间轴标签 -->
@@ -121,7 +121,7 @@
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     Visibility="{x:Bind ViewModel.HasData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel>
-                    <TextBlock Text="快照数据记录" Padding="16,12,16,8"
+                    <TextBlock x:Uid="TrendPageRecordTitle" Text="快照数据记录" Padding="16,12,16,8"
                                Style="{StaticResource BodyStrongTextBlockStyle}"/>
                     <ListView
                         ItemsSource="{x:Bind ViewModel.TrendPoints, Mode=OneWay}"
@@ -134,12 +134,12 @@
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="80"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="时间" FontWeight="SemiBold"
+                                <TextBlock Grid.Column="0" x:Uid="TrendPageHeaderTime" Text="时间" FontWeight="SemiBold"
                                            Style="{StaticResource CaptionTextBlockStyle}"/>
-                                <TextBlock Grid.Column="1" Text="已用空间" FontWeight="SemiBold"
+                                <TextBlock Grid.Column="1" x:Uid="TrendPageHeaderUsed" Text="已用空间" FontWeight="SemiBold"
                                            Style="{StaticResource CaptionTextBlockStyle}"
                                            HorizontalAlignment="Right"/>
-                                <TextBlock Grid.Column="2" Text="占比" FontWeight="SemiBold"
+                                <TextBlock Grid.Column="2" x:Uid="TrendPageHeaderRatio" Text="占比" FontWeight="SemiBold"
                                            Style="{StaticResource CaptionTextBlockStyle}"
                                            HorizontalAlignment="Right"/>
                             </Grid>
@@ -188,10 +188,10 @@
                         Visibility="{x:Bind ViewModel.HasData, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <FontIcon Glyph="&#xE9D9;" FontSize="48"
                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                <TextBlock Text="暂无趋势数据"
+                <TextBlock x:Uid="TrendPageEmptyTitle" Text="暂无趋势数据"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center"/>
-                <TextBlock Text="请先在【历史快照】页面创建多个快照，之后趋势图将自动显示"
+                <TextBlock x:Uid="TrendPageEmptyDescription" Text="请先在【历史快照】页面创建多个快照，之后趋势图将自动显示"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                            HorizontalAlignment="Center"
@@ -204,7 +204,7 @@
             <StackPanel HorizontalAlignment="Center" Spacing="12"
                         Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <ProgressRing Width="40" Height="40" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
-                <TextBlock Text="正在加载趋势数据..."
+                <TextBlock x:Uid="TrendPageLoadingText" Text="正在加载趋势数据..."
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center"/>
             </StackPanel>
@@ -212,3 +212,4 @@
         </StackPanel>
     </ScrollViewer>
 </Page>
+

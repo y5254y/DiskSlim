@@ -104,31 +104,31 @@ public class WslService : IWslService
                     SizeBeforeBytes: 0,
                     SizeAfterBytes: 0,
                     Output: string.Empty,
-                    ErrorMessage: $"未找到 {distribution.Name} 的 vhdx 文件");
+                    ErrorMessage: Localizer.Format("Svc.Wsl.VhdxNotFound", "未找到 {0} 的 vhdx 文件", distribution.Name));
             }
 
             // 第一步：关闭 WSL（确保 vhdx 未被锁定）
-            progress?.Report($"[{distribution.Name}] 正在关闭 WSL…");
+            progress?.Report(Localizer.Format("Svc.Wsl.ShuttingDown", "[{0}] 正在关闭 WSL…", distribution.Name));
             await RunProcessAsync("wsl", "--shutdown", cancellationToken);
             await Task.Delay(2000, cancellationToken); // 等待 WSL 完全关闭
 
             // 第二步：创建临时 diskpart 脚本并压缩 vhdx
-            progress?.Report($"[{distribution.Name}] 正在通过 diskpart 压缩虚拟磁盘…");
+            progress?.Report(Localizer.Format("Svc.Wsl.Compacting", "[{0}] 正在通过 diskpart 压缩虚拟磁盘…", distribution.Name));
             var (diskpartOutput, diskpartError) = await RunDiskpartCompactAsync(
                 distribution.VhdxPath, cancellationToken);
 
             long sizeAfter = GetFileSize(distribution.VhdxPath);
             var fullOutput = new StringBuilder();
-            fullOutput.AppendLine("=== WSL 关闭完成 ===");
-            fullOutput.AppendLine("=== diskpart 压缩输出 ===");
+            fullOutput.AppendLine(Localizer.Get("Svc.Wsl.OutputShutdownDone", "=== WSL 关闭完成 ==="));
+            fullOutput.AppendLine(Localizer.Get("Svc.Wsl.OutputCompact", "=== diskpart 压缩输出 ==="));
             fullOutput.Append(diskpartOutput);
             if (!string.IsNullOrWhiteSpace(diskpartError))
             {
-                fullOutput.AppendLine("=== 错误输出 ===");
+                fullOutput.AppendLine(Localizer.Get("Svc.Wsl.OutputError", "=== 错误输出 ==="));
                 fullOutput.Append(diskpartError);
             }
 
-            progress?.Report($"[{distribution.Name}] 完成！节省 {FileSizeHelper.Format(sizeBefore - sizeAfter)}");
+            progress?.Report(Localizer.Format("Svc.Wsl.Done", "[{0}] 完成！节省 {1}", distribution.Name, FileSizeHelper.Format(sizeBefore - sizeAfter)));
 
             return new WslReclaimResult(
                 IsSuccess: true,
@@ -157,7 +157,7 @@ public class WslService : IWslService
     {
         // 验证路径中不含会破坏 diskpart 脚本语法的特殊字符
         if (vhdxPath.Contains('"'))
-            throw new InvalidOperationException($"vhdx 路径包含不支持的字符（引号）：{vhdxPath}");
+            throw new InvalidOperationException(Localizer.Format("Svc.Wsl.PathHasQuote", "vhdx 路径包含不支持的字符（引号）：{0}", vhdxPath));
 
         // 创建临时 diskpart 脚本文件
         var scriptPath = Path.Combine(Path.GetTempPath(), $"diskslim_wsl_{Guid.NewGuid():N}.txt");
@@ -176,7 +176,7 @@ public class WslService : IWslService
             };
 
             using var process = Process.Start(psi)
-                ?? throw new InvalidOperationException("无法启动 diskpart.exe");
+                ?? throw new InvalidOperationException(Localizer.Get("Svc.Wsl.CannotStartDiskpart", "无法启动 diskpart.exe"));
 
             string output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
             string error = await process.StandardError.ReadToEndAsync(cancellationToken);
@@ -206,7 +206,7 @@ public class WslService : IWslService
         };
 
         using var process = Process.Start(psi)
-            ?? throw new InvalidOperationException("无法启动 wsl.exe");
+            ?? throw new InvalidOperationException(Localizer.Get("Svc.Wsl.CannotStartWsl", "无法启动 wsl.exe"));
 
         string output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);
@@ -228,7 +228,7 @@ public class WslService : IWslService
         };
 
         using var process = Process.Start(psi)
-            ?? throw new InvalidOperationException($"无法启动 {fileName}");
+            ?? throw new InvalidOperationException(Localizer.Format("Svc.Wsl.CannotStartProcess", "无法启动 {0}", fileName));
 
         string output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
         await process.WaitForExitAsync(cancellationToken);

@@ -33,9 +33,9 @@
                            Style="{StaticResource BodyTextBlockStyle}"/>
                 <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                    <Run Text="C盘软件："/>
+                    <Run x:Uid="SoftwareMovePageSystemDrivePrefix" Text="C盘软件："/>
                     <Run Text="{x:Bind ViewModel.SystemDriveSoftwareCount, Mode=OneWay}"/>
-                    <Run Text=" 个，合计 "/>
+                    <Run x:Uid="SoftwareMovePageSystemDriveMiddle" Text=" 个，合计 "/>
                     <Run Text="{x:Bind ViewModel.SystemDriveTotalSizeText, Mode=OneWay}" FontWeight="SemiBold"/>
                 </TextBlock>
             </StackPanel>
@@ -43,6 +43,7 @@
             <!-- 仅显示C盘开关 -->
             <ToggleSwitch
                 Grid.Column="1"
+                x:Uid="SoftwareMovePageSystemDriveOnlySwitch"
                 Header="仅C盘软件"
                 IsOn="{x:Bind ViewModel.ShowSystemDriveOnly, Mode=TwoWay}"
                 VerticalAlignment="Center"/>
@@ -54,12 +55,12 @@
                     IsEnabled="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <FontIcon Glyph="&#xE773;" FontSize="14"/>
-                    <TextBlock Text="扫描软件"/>
+                    <TextBlock x:Uid="SoftwareMovePageScanSoftwareText" Text="扫描软件"/>
                 </StackPanel>
             </Button>
 
             <!-- 目标盘选择 -->
-            <ComboBox Grid.Column="3" Header="目标盘符"
+            <ComboBox Grid.Column="3" x:Uid="SoftwareMovePageTargetDriveCombo" Header="目标盘符"
                       ItemsSource="{x:Bind ViewModel.AvailableDrives, Mode=OneWay}"
                       SelectedItem="{x:Bind ViewModel.TargetDrive, Mode=TwoWay}"/>
             <!--
@@ -79,7 +80,7 @@
                     IsEnabled="{x:Bind ViewModel.IsMoving, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <FontIcon Glyph="&#xE8B7;" FontSize="14"/>
-                    <TextBlock Text="搬家"/>
+                    <TextBlock x:Uid="SoftwareMovePageMoveText" Text="搬家"/>
                 </StackPanel>
             </Button>
         </Grid>
@@ -109,7 +110,7 @@
                                 <Border Background="{ThemeResource SystemFillColorNeutralBackgroundBrush}"
                                         CornerRadius="4" Padding="6,2"
                                         Visibility="{x:Bind MigratedToPath, Converter={StaticResource NullToInvisibilityConverter}}">
-                                    <TextBlock Text="已搬家" Style="{StaticResource CaptionTextBlockStyle}" FontSize="10"/>
+                                    <TextBlock x:Uid="SoftwareMovePageMovedBadge" Text="已搬家" Style="{StaticResource CaptionTextBlockStyle}" FontSize="10"/>
                                 </Border>
                             </StackPanel>
                             <TextBlock Text="{x:Bind Publisher}"
@@ -147,3 +148,4 @@
                      Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
     </Grid>
 </Page>
+

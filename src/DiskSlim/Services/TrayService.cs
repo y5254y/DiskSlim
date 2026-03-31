@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using DiskSlim.Helpers;
 
 namespace DiskSlim.Services;
 
@@ -40,7 +41,7 @@ public class TrayService : ITrayService
     {
         _hwnd = hwnd;
 
-        var iconData = BuildNotifyIconData("DiskSlim - 正在加载…");
+        var iconData = BuildNotifyIconData(Localizer.Get("Tray.Loading", "DiskSlim - 正在加载…"));
         iconData.uFlags = NifMessage | NifIcon | NifTip;
 
         NativeMethods.Shell_NotifyIcon(NimAdd, ref iconData);
@@ -62,7 +63,7 @@ public class TrayService : ITrayService
     {
         if (!_initialized) return;
 
-        var iconData = BuildNotifyIconData(tooltip: "DiskSlim");
+        var iconData = BuildNotifyIconData(tooltip: Localizer.Get("Tray.AppName", "DiskSlim"));
         iconData.uFlags = NifInfo;
         iconData.szInfoTitle = title.Length > 63 ? title[..63] : title;
         iconData.szInfo = message.Length > 255 ? message[..255] : message;

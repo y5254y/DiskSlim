@@ -1,3 +1,5 @@
+using DiskSlim.Helpers;
+
 namespace DiskSlim.Models;
 
 /// <summary>
@@ -31,8 +33,8 @@ public class CleanupReport
 
     /// <summary>耗时友好显示</summary>
     public string DurationText => Duration.TotalSeconds < 60
-        ? $"{Duration.TotalSeconds:F1} 秒"
-        : $"{(int)Duration.TotalMinutes} 分 {Duration.Seconds} 秒";
+        ? Localizer.Format("Model.CleanupReport.Duration.Seconds", "{0:F1} 秒", Duration.TotalSeconds)
+        : Localizer.Format("Model.CleanupReport.Duration.MinSec", "{0} 分 {1} 秒", (int)Duration.TotalMinutes, Duration.Seconds);
 }
 
 /// <summary>

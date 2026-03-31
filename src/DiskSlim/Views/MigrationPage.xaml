@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="DiskSlim.Views.MigrationPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -24,7 +23,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="选择要迁移的文件夹"
+            <TextBlock Grid.Row="0" x:Uid="MigrationPageSelectFolderTitle" Text="选择要迁移的文件夹"
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        Padding="24,16"/>
 
@@ -34,7 +33,7 @@
                         Padding="24,16"
                         Visibility="{x:Bind ViewModel.IsLoadingFolders, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <ProgressRing Width="14" Height="14" IsActive="True"/>
-                <TextBlock Text="正在计算文件夹大小..."
+                <TextBlock x:Uid="MigrationPageCalculatingText" Text="正在计算文件夹大小..."
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             </StackPanel>
@@ -63,7 +62,7 @@
                                     <Border Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}"
                                             CornerRadius="4" Padding="6,2"
                                             Visibility="{x:Bind IsMigrated, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <TextBlock Text="已迁移" Style="{StaticResource CaptionTextBlockStyle}"
+                                        <TextBlock x:Uid="MigrationPageMigratedBadge" Text="已迁移" Style="{StaticResource CaptionTextBlockStyle}"
                                                    Foreground="{ThemeResource SystemFillColorSuccessBrush}" FontSize="10"/>
                                     </Border>
                                 </StackPanel>
@@ -94,12 +93,12 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="迁移配置"
+            <TextBlock Grid.Row="0" x:Uid="MigrationPageConfigTitle" Text="迁移配置"
                        Style="{StaticResource SubtitleTextBlockStyle}"/>
 
             <!-- 目标盘选择 -->
             <StackPanel Grid.Row="1" Spacing="4">
-                <TextBlock Text="目标盘符" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <TextBlock x:Uid="MigrationPageTargetDriveLabel" Text="目标盘符" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                 <ComboBox
                     HorizontalAlignment="Stretch"
                     ItemsSource="{x:Bind ViewModel.AvailableDrives, Mode=OneWay}"
@@ -108,6 +107,7 @@
 
             <!-- 空间不足警告 -->
             <InfoBar Grid.Row="2"
+                     x:Uid="MigrationPageSpaceErrorBar"
                      IsOpen="{x:Bind ViewModel.HasSpaceError, Mode=OneWay}"
                      Severity="Error"
                      Title="空间不足"
@@ -133,13 +133,13 @@
                     IsEnabled="{x:Bind ViewModel.IsMigrating, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8B7;" FontSize="14"/>
-                        <TextBlock Text="开始迁移"/>
+                        <TextBlock x:Uid="MigrationPageStartMigrateText" Text="开始迁移"/>
                     </StackPanel>
                 </Button>
                 <Button HorizontalAlignment="Stretch"
                         Command="{x:Bind ViewModel.CancelCommand}"
                         Visibility="{x:Bind ViewModel.IsMigrating, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="取消"/>
+                    <TextBlock x:Uid="MigrationPageCancelText" Text="取消"/>
                 </Button>
             </StackPanel>
 
@@ -153,3 +153,4 @@
         </Grid>
     </Grid>
 </Page>
+

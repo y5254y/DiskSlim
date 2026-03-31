@@ -25,6 +25,10 @@
     <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(DistributionChannel)' == 'Store'">
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+
   <!-- Direct 路线：目录直发（Unpackaged + Self-contained） -->
   <PropertyGroup Condition="'$(DistributionChannel)' == 'Direct'">
     <ApplicationManifest>app.direct.manifest</ApplicationManifest>

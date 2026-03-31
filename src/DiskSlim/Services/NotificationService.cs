@@ -9,7 +9,7 @@ namespace DiskSlim.Services;
 /// </summary>
 public class NotificationService : INotificationService
 {
-    private const string AppId = "DiskSlim.C盘瘦身大师";
+    private static readonly string AppId = Localizer.Get("Svc.Notification.AppId", "DiskSlim.C盘瘦身大师");
 
     /// <summary>
     /// 发送 Toast 通知
@@ -27,7 +27,7 @@ public class NotificationService : INotificationService
                     </binding>
                   </visual>
                   <actions>
-                    <action content="打开 DiskSlim" activationType="foreground" arguments="open"/>
+                    <action content="{System.Net.WebUtility.HtmlEncode(Localizer.Get("Svc.Notification.OpenAction", "打开 DiskSlim"))}" activationType="foreground" arguments="open"/>
                   </actions>
                 </toast>
                 """;
@@ -52,8 +52,8 @@ public class NotificationService : INotificationService
     {
         string freeText = FileSizeHelper.Format(freeBytes);
         ShowToast(
-            "⚠️ C盘空间不足",
-            $"C盘剩余空间仅剩 {freeText}，建议立即清理。",
+            Localizer.Get("Svc.Notification.LowDiskTitle", "⚠️ C盘空间不足"),
+            Localizer.Format("Svc.Notification.LowDiskBody", "C盘剩余空间仅剩 {0}，建议立即清理。", freeText),
             "open_diskslim");
     }
 }

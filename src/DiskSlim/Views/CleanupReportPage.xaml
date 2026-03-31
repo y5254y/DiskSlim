@@ -31,12 +31,13 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="清理记录" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                    <TextBlock x:Uid="CleanupReportPageHistoryTitle" Text="清理记录" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                     <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                 </StackPanel>
                 <Button Grid.Column="1" Command="{x:Bind ViewModel.LoadReportsCommand}"
+                        x:Uid="CleanupReportPageRefreshButton"
                         ToolTipService.ToolTip="刷新"
                         Style="{StaticResource SubtleButtonStyle}">
                     <FontIcon Glyph="&#xE72C;" FontSize="14"/>
@@ -65,7 +66,7 @@
                                 <TextBlock Text="{x:Bind CompletedAtText}" FontWeight="SemiBold"
                                            Style="{StaticResource BodyTextBlockStyle}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <TextBlock Text="释放" Style="{StaticResource CaptionTextBlockStyle}"
+                                    <TextBlock x:Uid="CleanupReportPageFreedLabel" Text="释放" Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     <TextBlock Text="{x:Bind TotalFreedText}"
                                                Style="{StaticResource CaptionTextBlockStyle}"
@@ -89,10 +90,10 @@
                         Visibility="{x:Bind ViewModel.HasReports, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <FontIcon Glyph="&#xE74D;" FontSize="36"
                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                <TextBlock Text="暂无清理记录"
+                <TextBlock x:Uid="CleanupReportPageEmptyTitle" Text="暂无清理记录"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center"/>
-                <TextBlock Text="执行清理后记录会显示在这里"
+                <TextBlock x:Uid="CleanupReportPageEmptyDescription" Text="执行清理后记录会显示在这里"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                            HorizontalAlignment="Center"/>
@@ -105,7 +106,7 @@
                     Visibility="{x:Bind ViewModel.HasReports, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <FontIcon Glyph="&#xE74D;" FontSize="12"/>
-                    <TextBlock Text="删除此记录"/>
+                    <TextBlock x:Uid="CleanupReportPageDeleteRecordText" Text="删除此记录"/>
                 </StackPanel>
             </Button>
         </Grid>
@@ -138,14 +139,14 @@
                                Style="{StaticResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="16">
                         <StackPanel>
-                            <TextBlock Text="总释放空间" Style="{StaticResource CaptionTextBlockStyle}"
+                            <TextBlock x:Uid="CleanupReportPageTotalFreedLabel" Text="总释放空间" Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <TextBlock Text="{x:Bind ViewModel.SelectedReport.TotalFreedText, Mode=OneWay}"
                                        Style="{StaticResource TitleTextBlockStyle}"
                                        Foreground="{ThemeResource SystemFillColorSuccessBrush}"/>
                         </StackPanel>
                         <StackPanel>
-                            <TextBlock Text="耗时" Style="{StaticResource CaptionTextBlockStyle}"
+                            <TextBlock x:Uid="CleanupReportPageDurationLabel" Text="耗时" Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             <TextBlock Text="{x:Bind ViewModel.SelectedReport.DurationText, Mode=OneWay}"
                                        Style="{StaticResource SubtitleTextBlockStyle}"/>
@@ -157,14 +158,14 @@
                 <Button Grid.Column="1" Command="{x:Bind ViewModel.ExportToTextCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE8A5;" FontSize="14"/>
-                        <TextBlock Text="导出 TXT"/>
+                        <TextBlock x:Uid="CleanupReportPageExportTxtText" Text="导出 TXT"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Column="2"
                         Command="{x:Bind ViewModel.ExportToCsvCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE9F9;" FontSize="14"/>
-                        <TextBlock Text="导出 CSV"/>
+                        <TextBlock x:Uid="CleanupReportPageExportCsvText" Text="导出 CSV"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Column="3"
@@ -172,7 +173,7 @@
                         Command="{x:Bind ViewModel.ExportToHtmlCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE7C3;" FontSize="14"/>
-                        <TextBlock Text="导出 HTML"/>
+                        <TextBlock x:Uid="CleanupReportPageExportHtmlText" Text="导出 HTML"/>
                     </StackPanel>
                 </Button>
             </Grid>
@@ -193,12 +194,12 @@
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="60"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="清理项目" FontWeight="SemiBold"
+                        <TextBlock Grid.Column="0" x:Uid="CleanupReportPageHeaderName" Text="清理项目" FontWeight="SemiBold"
                                    Style="{StaticResource CaptionTextBlockStyle}"/>
-                        <TextBlock Grid.Column="1" Text="释放空间" FontWeight="SemiBold"
+                        <TextBlock Grid.Column="1" x:Uid="CleanupReportPageHeaderFreed" Text="释放空间" FontWeight="SemiBold"
                                    Style="{StaticResource CaptionTextBlockStyle}"
                                    HorizontalAlignment="Right"/>
-                        <TextBlock Grid.Column="2" Text="状态" FontWeight="SemiBold"
+                        <TextBlock Grid.Column="2" x:Uid="CleanupReportPageHeaderStatus" Text="状态" FontWeight="SemiBold"
                                    Style="{StaticResource CaptionTextBlockStyle}"
                                    HorizontalAlignment="Center"/>
                     </Grid>
@@ -235,9 +236,10 @@
                     Visibility="{x:Bind ViewModel.SelectedReport, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
             <FontIcon Glyph="&#xE9F9;" FontSize="48"
                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <TextBlock Text="从左侧选择一条清理记录查看详情"
+            <TextBlock x:Uid="CleanupReportPagePlaceholderText" Text="从左侧选择一条清理记录查看详情"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Page>
+

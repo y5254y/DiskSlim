@@ -13,7 +13,7 @@ public sealed partial class MigrationPage : Page
 
     public MigrationPage()
     {
-        this.InitializeComponent();
         ViewModel = App.Services.GetRequiredService<MigrationViewModel>();
+        this.InitializeComponent();
     }
 }

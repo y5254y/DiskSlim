@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using Microsoft.Data.Sqlite;
 
@@ -260,7 +261,7 @@ public class SnapshotService : ISnapshotService
     /// </summary>
     public async Task<DiskSnapshot> CreateSnapshotAsync(string? label, IProgress<string>? progress, CancellationToken token)
     {
-        progress?.Report("正在获取磁盘信息...");
+        progress?.Report(Localizer.Get("Svc.Snapshot.GetDriveInfo", "正在获取磁盘信息..."));
 
         // 获取磁盘空间信息
         var driveInfo = new System.IO.DriveInfo(DriveToScan);
@@ -274,7 +275,7 @@ public class SnapshotService : ISnapshotService
         };
 
         // 扫描C盘顶层文件夹大小
-        progress?.Report("正在扫描文件夹大小...");
+        progress?.Report(Localizer.Get("Svc.Snapshot.ScanFolderSizes", "正在扫描文件夹大小..."));
         try
         {
             var topDirs = Directory.GetDirectories(DriveToScan, "*", SearchOption.TopDirectoryOnly);
@@ -284,7 +285,7 @@ public class SnapshotService : ISnapshotService
 
                 try
                 {
-                    progress?.Report($"扫描：{Path.GetFileName(dir)}");
+                    progress?.Report(Localizer.Format("Svc.Snapshot.ScanningFolder", "扫描：{0}", Path.GetFileName(dir)));
                     long size = await Task.Run(() => GetDirectorySize(dir, token), token);
                     snapshot.FolderItems.Add(new SnapshotFolderItem
                     {
@@ -311,7 +312,7 @@ public class SnapshotService : ISnapshotService
             // 忽略扫描错误
         }
 
-        progress?.Report("正在保存快照...");
+        progress?.Report(Localizer.Get("Svc.Snapshot.Saving", "正在保存快照..."));
         await SaveSnapshotAsync(snapshot);
 
         return snapshot;

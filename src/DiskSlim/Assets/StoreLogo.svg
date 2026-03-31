@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <defs>
+    <linearGradient id="diskGradSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#005A9E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <circle cx="25" cy="25" r="18" fill="url(#diskGradSmall)"/>
+  <circle cx="25" cy="25" r="10" fill="#ffffff" opacity="0.2"/>
+  <circle cx="25" cy="25" r="6" fill="url(#diskGradSmall)" opacity="0.9"/>
+  
+  <g transform="translate(32, 12) rotate(45)">
+    <rect x="0" y="0" width="4" height="18" rx="1" fill="#8B4513"/>
+    <rect x="-3" y="16" width="10" height="12" rx="2" fill="#22C55E"/>
+  </g>
+  
+  <circle cx="36" cy="36" r="5" fill="#22C55E"/>
+  <line x1="33" y1="36" x2="39" y2="36" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+</svg>

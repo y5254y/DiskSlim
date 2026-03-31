@@ -1,3 +1,4 @@
+using DiskSlim.Helpers;
 using DiskSlim.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
@@ -15,6 +16,11 @@ public sealed partial class DashboardPage : Page
     {
         this.InitializeComponent();
         ViewModel = App.Services.GetRequiredService<DashboardViewModel>();
+
+        UsedLabelText.Text = Localizer.Get("DashboardPageUsedLabel.Text", "已使用");
+        FreeLabelText.Text = Localizer.Get("DashboardPageFreeLabel.Text", "可用");
+        TotalLabelText.Text = Localizer.Get("DashboardPageTotalLabel.Text", "总容量");
+
         this.Loaded += async (s, e) =>
         {
             try

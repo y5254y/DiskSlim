@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DiskSlim.Helpers;
 using DiskSlim.Models;
 using DiskSlim.Services;
 using System.Collections.ObjectModel;
@@ -41,13 +42,13 @@ public partial class TrendViewModel : ObservableObject
     private bool _isLoading;
 
     [ObservableProperty]
-    private string _statusMessage = "请先添加快照数据以分析趋势";
+    private string _statusMessage = Localizer.Get("Vm.Trend.NeedSnapshot", "请先添加快照数据以分析趋势");
 
     [ObservableProperty]
     private bool _hasData;
 
     [ObservableProperty]
-    private string _selectedTimeRange = "全部";
+    private string _selectedTimeRange = Localizer.Get("Vm.Trend.RangeAll", "全部");
 
     [ObservableProperty]
     private string _predictionText = string.Empty;
@@ -71,7 +72,13 @@ public partial class TrendViewModel : ObservableObject
     private string _growthRateText = "—";
 
     /// <summary>可选时间范围</summary>
-    public List<string> TimeRanges { get; } = ["7天", "30天", "90天", "全部"];
+    public List<string> TimeRanges { get; } =
+    [
+        Localizer.Get("Vm.Trend.Range7Days", "7天"),
+        Localizer.Get("Vm.Trend.Range30Days", "30天"),
+        Localizer.Get("Vm.Trend.Range90Days", "90天"),
+        Localizer.Get("Vm.Trend.RangeAll", "全部")
+    ];
 
     public TrendViewModel(ISnapshotService snapshotService)
     {
@@ -85,7 +92,7 @@ public partial class TrendViewModel : ObservableObject
     public async Task LoadTrendDataAsync()
     {
         IsLoading = true;
-        StatusMessage = "正在加载趋势数据...";
+        StatusMessage = Localizer.Get("Vm.Trend.Loading", "正在加载趋势数据...");
 
         try
         {
@@ -94,9 +101,9 @@ public partial class TrendViewModel : ObservableObject
             // 按时间范围筛选
             var cutoff = SelectedTimeRange switch
             {
-                "7天" => DateTime.Now.AddDays(-7),
-                "30天" => DateTime.Now.AddDays(-30),
-                "90天" => DateTime.Now.AddDays(-90),
+                _ when SelectedTimeRange == Localizer.Get("Vm.Trend.Range7Days", "7天") => DateTime.Now.AddDays(-7),
+                _ when SelectedTimeRange == Localizer.Get("Vm.Trend.Range30Days", "30天") => DateTime.Now.AddDays(-30),
+                _ when SelectedTimeRange == Localizer.Get("Vm.Trend.Range90Days", "90天") => DateTime.Now.AddDays(-90),
                 _ => DateTime.MinValue
             };
 
@@ -137,7 +144,7 @@ public partial class TrendViewModel : ObservableObject
                         double deltaGB = last.UsedGB - first.UsedGB;
                         double dailyGB = deltaGB / days;
                         GrowthRateText = dailyGB == 0
-                            ? "±0.00 GB/天（稳定）"
+                            ? Localizer.Get("Vm.Trend.GrowthStable", "±0.00 GB/天（稳定）")
                             : $"{dailyGB:+0.00;-0.00} GB/天";
 
                         // 预测
@@ -145,22 +152,22 @@ public partial class TrendViewModel : ObservableObject
                     }
                     else
                     {
-                        GrowthRateText = "数据点时间间隔太短";
+                        GrowthRateText = Localizer.Get("Vm.Trend.IntervalTooShort", "数据点时间间隔太短");
                     }
                 }
 
-                StatusMessage = $"共 {TrendPoints.Count} 个数据点（{SelectedTimeRange}）";
+                StatusMessage = Localizer.Format("Vm.Trend.PointCount", "共 {0} 个数据点（{1}）", TrendPoints.Count, SelectedTimeRange);
             }
             else
             {
-                StatusMessage = "所选时间范围内无快照数据，请先在【历史快照】页创建快照";
+                StatusMessage = Localizer.Get("Vm.Trend.NoDataInRange", "所选时间范围内无快照数据，请先在【历史快照】页创建快照");
                 PredictionText = string.Empty;
                 HasPrediction = false;
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"加载失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Trend.LoadFailed", "加载失败：{0}", ex.Message);
         }
         finally
         {
@@ -175,7 +182,7 @@ public partial class TrendViewModel : ObservableObject
     {
         if (dailyGrowthGB <= 0)
         {
-            PredictionText = "磁盘使用量稳定或在缩减，无需担心";
+            PredictionText = Localizer.Get("Vm.Trend.StablePrediction", "磁盘使用量稳定或在缩减，无需担心");
             HasPrediction = true;
             IsDangerPrediction = false;
             return;
@@ -192,22 +199,22 @@ public partial class TrendViewModel : ObservableObject
 
             if (daysToFull < 0)
             {
-                PredictionText = "磁盘使用量稳定或在缩减，无需担心";
+                PredictionText = Localizer.Get("Vm.Trend.StablePrediction", "磁盘使用量稳定或在缩减，无需担心");
                 IsDangerPrediction = false;
             }
             else if (daysToFull < 7)
             {
-                PredictionText = $"⚠️ 危险！按当前增长速率，C盘将在约 {daysToFull:F0} 天内满！请立即清理！";
+                PredictionText = Localizer.Format("Vm.Trend.DangerPrediction", "⚠️ 危险！按当前增长速率，C盘将在约 {0:F0} 天内满！请立即清理！", daysToFull);
                 IsDangerPrediction = true;
             }
             else if (daysToFull < 30)
             {
-                PredictionText = $"⚠️ 注意：按当前速率，C盘将在约 {daysToFull:F0} 天内满，建议提前清理";
+                PredictionText = Localizer.Format("Vm.Trend.WarningPrediction", "⚠️ 注意：按当前速率，C盘将在约 {0:F0} 天内满，建议提前清理", daysToFull);
                 IsDangerPrediction = true;
             }
             else
             {
-                PredictionText = $"✅ 按当前速率，C盘约 {daysToFull:F0} 天后才会满（{DateTime.Now.AddDays(daysToFull):yyyy年MM月dd日}）";
+                PredictionText = Localizer.Format("Vm.Trend.SafePrediction", "✅ 按当前速率，C盘约 {0:F0} 天后才会满（{1:yyyy年MM月dd日}）", daysToFull, DateTime.Now.AddDays(daysToFull));
                 IsDangerPrediction = false;
             }
 

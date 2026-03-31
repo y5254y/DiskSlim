@@ -59,7 +59,7 @@ public partial class DashboardViewModel : ObservableObject
     private bool _isLoaded;
 
     [ObservableProperty]
-    private string _statusMessage = "点击刷新查看C盘使用情况";
+    private string _statusMessage = Localizer.Get("Vm.Dashboard.ClickRefresh", "点击刷新查看C盘使用情况");
 
     // ===== Top 文件列表 =====
     public ObservableCollection<FileItem> TopItems { get; } = new();
@@ -79,12 +79,12 @@ public partial class DashboardViewModel : ObservableObject
         if (IsScanning) return;
 
         IsScanning = true;
-        StatusMessage = "正在扫描C盘...";
+        StatusMessage = Localizer.Get("Vm.Dashboard.ScanningDrive", "正在扫描C盘...");
 
         try
         {
             // 获取磁盘基础信息
-            var driveModel = await _diskScanService.ScanDriveAsync("C:\\");
+            var driveModel = await _diskScanService.ScanDriveAsync("C:\\ようこそ");
 
             TotalBytes = driveModel.TotalBytes;
             UsedBytes = driveModel.UsedBytes;
@@ -97,7 +97,7 @@ public partial class DashboardViewModel : ObservableObject
             UsagePercentText = $"{UsagePercent:F1}%";
 
             // 扫描可释放空间估算
-            StatusMessage = "正在估算可释放空间...";
+            StatusMessage = Localizer.Get("Vm.Dashboard.EstimatingCleanup", "正在估算可释放空间...");
             var cleanupItems = _cleanupService.GetCleanupItems();
             await _cleanupService.ScanEstimatedSizesAsync(cleanupItems);
             EstimatedFreeableBytes = cleanupItems
@@ -106,18 +106,18 @@ public partial class DashboardViewModel : ObservableObject
             EstimatedFreeableText = FileSizeHelper.Format(EstimatedFreeableBytes);
 
             // 扫描 Top 大文件
-            StatusMessage = "正在扫描大文件...";
+            StatusMessage = Localizer.Get("Vm.Dashboard.ScanningTopFiles", "正在扫描大文件...");
             var topItems = await _diskScanService.ScanTopItemsAsync("C:\\", maxItems: 10);
             TopItems.Clear();
             foreach (var item in topItems)
                 TopItems.Add(item);
 
             IsLoaded = true;
-            StatusMessage = $"扫描完成 · {DateTime.Now:HH:mm:ss}";
+            StatusMessage = Localizer.Format("Vm.Dashboard.ScanCompleted", "扫描完成 · {0:HH:mm:ss}", DateTime.Now);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"扫描出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Dashboard.ScanError", "扫描出错：{0}", ex.Message);
         }
         finally
         {

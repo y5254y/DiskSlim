@@ -21,6 +21,7 @@
                 <Grid Padding="0,4,0,0">
                     <TextBlock
                         x:Name="PageTitle"
+                        x:Uid="PageTitle"
                         Style="{StaticResource TitleTextBlockStyle}"
                         Text="空间分析" />
                 </Grid>
@@ -30,6 +31,7 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     x:Name="NavDashboard"
+                    x:Uid="NavDashboard"
                     Content="空间分析"
                     Tag="Dashboard">
                     <NavigationViewItem.Icon>
@@ -39,6 +41,7 @@
 
                 <NavigationViewItem
                     x:Name="NavCleanup"
+                    x:Uid="NavCleanup"
                     Content="智能清理"
                     Tag="Cleanup">
                     <NavigationViewItem.Icon>
@@ -48,6 +51,7 @@
 
                 <NavigationViewItem
                     x:Name="NavMigration"
+                    x:Uid="NavMigration"
                     Content="文件夹迁移"
                     Tag="Migration">
                     <NavigationViewItem.Icon>
@@ -57,6 +61,7 @@
 
                 <NavigationViewItem
                     x:Name="NavSoftwareMove"
+                    x:Uid="NavSoftwareMove"
                     Content="软件搬家"
                     Tag="SoftwareMove">
                     <NavigationViewItem.Icon>
@@ -66,6 +71,7 @@
 
                 <NavigationViewItem
                     x:Name="NavCleanupReport"
+                    x:Uid="NavCleanupReport"
                     Content="清理历史"
                     Tag="CleanupReport">
                     <NavigationViewItem.Icon>
@@ -77,6 +83,7 @@
 
                 <NavigationViewItem
                     x:Name="NavSnapshot"
+                    x:Uid="NavSnapshot"
                     Content="历史快照"
                     Tag="Snapshot">
                     <NavigationViewItem.Icon>
@@ -86,6 +93,7 @@
 
                 <NavigationViewItem
                     x:Name="NavTrend"
+                    x:Uid="NavTrend"
                     Content="趋势分析"
                     Tag="Trend">
                     <NavigationViewItem.Icon>
@@ -95,6 +103,7 @@
 
                 <NavigationViewItem
                     x:Name="NavOldFiles"
+                    x:Uid="NavOldFiles"
                     Content="旧文件检测"
                     Tag="OldFiles">
                     <NavigationViewItem.Icon>
@@ -106,6 +115,7 @@
 
                 <NavigationViewItem
                     x:Name="NavCompactOs"
+                    x:Uid="NavCompactOs"
                     Content="系统压缩"
                     Tag="CompactOs">
                     <NavigationViewItem.Icon>
@@ -115,6 +125,7 @@
 
                 <NavigationViewItem
                     x:Name="NavWsl"
+                    x:Uid="NavWsl"
                     Content="WSL 瘦身"
                     Tag="Wsl">
                     <NavigationViewItem.Icon>
@@ -127,6 +138,7 @@
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem
                     x:Name="NavSettings"
+                    x:Uid="NavSettings"
                     Content="设置"
                     Tag="Settings">
                     <NavigationViewItem.Icon>

@@ -1,3 +1,5 @@
+using DiskSlim.Helpers;
+
 namespace DiskSlim.Models;
 
 /// <summary>
@@ -99,7 +101,7 @@ public class SnapshotDiffItem
     {
         get
         {
-            if (DeltaBytes == 0) return "无变化";
+            if (DeltaBytes == 0) return Localizer.Get("Model.SnapshotDiff.NoChange", "无变化");
             string prefix = DeltaBytes > 0 ? "+" : "-";
             return $"{prefix}{Helpers.FileSizeHelper.Format(Math.Abs(DeltaBytes))}";
         }

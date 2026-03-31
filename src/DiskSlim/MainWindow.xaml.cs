@@ -46,11 +46,11 @@ public sealed partial class MainWindow : Window
 
         var dialog = new ContentDialog
         {
-            Title = "当前为普通权限模式",
-            Content = "DiskSlim 已正常启动。涉及系统目录、服务或休眠设置的操作可能需要管理员权限。你可以继续使用，或现在提权后重启。",
-            PrimaryButtonText = "继续使用",
-            SecondaryButtonText = "提权后重启",
-            CloseButtonText = "关闭",
+            Title = Localizer.Get("MainWindow.NonAdminDialog.Title", "当前为普通权限模式"),
+            Content = Localizer.Get("MainWindow.NonAdminDialog.Content", "DiskSlim 已正常启动。涉及系统目录、服务或休眠设置的操作可能需要管理员权限。你可以继续使用，或现在提权后重启。"),
+            PrimaryButtonText = Localizer.Get("MainWindow.NonAdminDialog.Primary", "继续使用"),
+            SecondaryButtonText = Localizer.Get("MainWindow.NonAdminDialog.Secondary", "提权后重启"),
+            CloseButtonText = Localizer.Get("MainWindow.NonAdminDialog.Close", "关闭"),
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = root.XamlRoot
         };
@@ -71,7 +71,7 @@ public sealed partial class MainWindow : Window
         var appWindow = AppWindow.GetFromWindowId(windowId);
 
         appWindow.Resize(new SizeInt32(1200, 780));
-        appWindow.Title = "DiskSlim - C盘瘦身大师";
+        appWindow.Title = Localizer.Get("MainWindow.Title", "DiskSlim - C盘瘦身大师");
     }
 
     /// <summary>

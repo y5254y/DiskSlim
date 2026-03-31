@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp rescap">
 
   <Identity
-    Name="DiskSlim.CSlimMaster"
-    Publisher="CN=DiskSlim"
+    Name="yangyifeng.C"
+    Publisher="CN=27B6D2A8-3CBB-4E7D-8676-15DE74D1334B"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="00000000-0000-0000-0000-000000000000" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>DiskSlim - C盘瘦身大师</DisplayName>
-    <PublisherDisplayName>DiskSlim Studio</PublisherDisplayName>
+    <DisplayName>C盘瘦身大师</DisplayName>
+    <PublisherDisplayName>yangyifeng</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <Description>智能清理 C 盘空间，支持系统压缩、文件迁移、WSL 瘦身，让你的电脑重获新生</Description>
   </Properties>
@@ -34,7 +34,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="DiskSlim - C盘瘦身大师"
+        DisplayName="C盘瘦身大师"
         Description="智能清理 C 盘空间，支持系统压缩、文件夹迁移、软件搬家、WSL 磁盘回收，让 Windows 重获新生"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
@@ -52,3 +52,6 @@
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
+
+
+

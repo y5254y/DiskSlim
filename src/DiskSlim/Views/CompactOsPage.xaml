@@ -65,17 +65,17 @@
                 <StackPanel Spacing="12">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE946;" FontSize="16" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-                        <TextBlock Text="什么是 CompactOS？" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock x:Uid="CompactOsPageWhatIsTitle" Text="什么是 CompactOS？" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                     </StackPanel>
-                    <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}">
+                    <TextBlock x:Uid="CompactOsPageWhatIsDescription" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}">
                         CompactOS 是 Windows 10/11 内置的系统文件压缩技术，使用 XPRESS 或 LZX 算法对系统文件进行透明压缩。
                         压缩后文件仍可正常读写，系统会自动在读写时解压/压缩，对性能影响极小。
                     </TextBlock>
-                    <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}">
+                    <TextBlock x:Uid="CompactOsPageSavingHint" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}">
                         <Run Text="💡 典型节省空间：" FontWeight="SemiBold"/>
                         <Run Text="1–3 GB（视已安装组件而定）"/>
                     </TextBlock>
-                    <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}">
+                    <TextBlock x:Uid="CompactOsPageDeviceHint" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}">
                         <Run Text="💻 适合机型：" FontWeight="SemiBold"/>
                         <Run Text="低存储容量设备（32/64 GB SSD），或 C 盘剩余空间极少的设备"/>
                     </TextBlock>
@@ -84,6 +84,7 @@
 
             <!-- 管理员权限提示 -->
             <InfoBar
+                x:Uid="CompactOsPageAdminInfoBar"
                 IsOpen="True"
                 IsClosable="False"
                 Severity="Warning"
@@ -97,7 +98,7 @@
                     IsEnabled="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE72C;" FontSize="14"/>
-                        <TextBlock Text="查询状态"/>
+                        <TextBlock x:Uid="CompactOsPageQueryStatusText" Text="查询状态"/>
                     </StackPanel>
                 </Button>
 
@@ -108,7 +109,7 @@
                     Visibility="{x:Bind ViewModel.IsCompressed, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE7EA;" FontSize="14"/>
-                        <TextBlock Text="启用压缩"/>
+                        <TextBlock x:Uid="CompactOsPageEnableText" Text="启用压缩"/>
                     </StackPanel>
                 </Button>
 
@@ -118,7 +119,7 @@
                     Visibility="{x:Bind ViewModel.IsCompressed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE894;" FontSize="14"/>
-                        <TextBlock Text="禁用压缩"/>
+                        <TextBlock x:Uid="CompactOsPageDisableText" Text="禁用压缩"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -134,7 +135,7 @@
                 <StackPanel Spacing="8">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE9D5;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Text="操作日志" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock x:Uid="CompactOsPageLogTitle" Text="操作日志" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                     </StackPanel>
                     <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
                         <TextBlock
@@ -150,3 +151,4 @@
         </StackPanel>
     </ScrollViewer>
 </Page>
+

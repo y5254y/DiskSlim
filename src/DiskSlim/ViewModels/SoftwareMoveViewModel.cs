@@ -46,7 +46,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
     private bool _isMoving;
 
     [ObservableProperty]
-    private string _statusMessage = @"点击""扫描软件""加载已安装软件列表";
+    private string _statusMessage = Localizer.Get("Vm.SoftwareMove.ClickScan", "点击\"扫描软件\"加载已安装软件列表");
 
     [ObservableProperty]
     private int _systemDriveSoftwareCount;
@@ -96,7 +96,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
         if (IsScanning) return;
 
         IsScanning = true;
-        StatusMessage = "正在扫描已安装软件...";
+        StatusMessage = Localizer.Get("Vm.SoftwareMove.Scanning", "正在扫描已安装软件...");
 
         try
         {
@@ -115,11 +115,11 @@ public partial class SoftwareMoveViewModel : ObservableObject
                 .Sum(s => s.InstallSizeBytes);
             SystemDriveTotalSizeText = FileSizeHelper.Format(totalSize);
 
-            StatusMessage = $"共找到 {SoftwareList.Count} 个软件（{SystemDriveTotalSizeText} 在C盘）";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.ScanCompleted", "共找到 {0} 个软件（{1} 在C盘）", SoftwareList.Count, SystemDriveTotalSizeText);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"扫描出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.ScanError", "扫描出错：{0}", ex.Message);
         }
         finally
         {
@@ -140,42 +140,42 @@ public partial class SoftwareMoveViewModel : ObservableObject
         {
             SelectedSoftware.CanMigrate = false;
             SelectedSoftware.MigratedToPath ??= _symlinkService.GetJunctionTarget(sourcePath) ?? "(Junction)";
-            StatusMessage = $"{SelectedSoftware.DisplayName} 已经是搬家后的链接目录，无需重复搬家";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.AlreadyMigrated", "{0} 已经是搬家后的链接目录，无需重复搬家", SelectedSoftware.DisplayName);
             return;
         }
 
         if (!SelectedSoftware.CanMigrate)
         {
-            StatusMessage = "该软件无法迁移（安装路径不明确或已迁移）";
+            StatusMessage = Localizer.Get("Vm.SoftwareMove.CannotMigrate", "该软件无法迁移（安装路径不明确或已迁移）");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(TargetDrive))
         {
-            StatusMessage = "请先选择目标盘符";
+            StatusMessage = Localizer.Get("Vm.SoftwareMove.SelectTargetDrive", "请先选择目标盘符");
             return;
         }
 
         if (!DriveInfo.GetDrives().Any(d => d.Name.StartsWith(TargetDrive, StringComparison.OrdinalIgnoreCase)))
         {
-            StatusMessage = $"目标盘 {TargetDrive} 不存在，请重新选择";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.TargetDriveNotExist", "目标盘 {0} 不存在，请重新选择", TargetDrive);
             return;
         }
 
         IsMoving = true;
-        StatusMessage = $"正在迁移：{SelectedSoftware.DisplayName}...";
+        StatusMessage = Localizer.Format("Vm.SoftwareMove.Migrating", "正在迁移：{0}...", SelectedSoftware.DisplayName);
 
         try
         {
             if (!AdminHelper.IsRunningAsAdmin())
             {
-                StatusMessage = "请以管理员身份运行后再执行软件搬家";
+                StatusMessage = Localizer.Get("Vm.SoftwareMove.RequireAdmin", "请以管理员身份运行后再执行软件搬家");
                 return;
             }
 
             if (!Directory.Exists(sourcePath))
             {
-                StatusMessage = "源安装目录不存在，无法迁移";
+                StatusMessage = Localizer.Get("Vm.SoftwareMove.SourceNotFound", "源安装目录不存在，无法迁移");
                 return;
             }
 
@@ -187,13 +187,13 @@ public partial class SoftwareMoveViewModel : ObservableObject
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
 
             // 复制软件文件到目标路径
-            StatusMessage = $"正在复制文件：{SelectedSoftware.DisplayName} → {targetPath}";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.CopyingTo", "正在复制文件：{0} → {1}", SelectedSoftware.DisplayName, targetPath);
             var copyProgress = new Progress<(int Copied, string CurrentFile)>(p =>
             {
                 if (p.Copied % 20 == 0)
                 {
                     string fileName = Path.GetFileName(p.CurrentFile);
-                    StatusMessage = $"正在复制文件：{SelectedSoftware.DisplayName}（已复制 {p.Copied} 个，当前：{fileName}）";
+                    StatusMessage = Localizer.Format("Vm.SoftwareMove.CopyingProgress", "正在复制文件：{0}（已复制 {1} 个，当前：{2}）", SelectedSoftware.DisplayName, p.Copied, fileName);
                 }
             });
             var copyResult = await CopySoftwareFilesAsync(sourcePath, targetPath, copyProgress);
@@ -201,13 +201,13 @@ public partial class SoftwareMoveViewModel : ObservableObject
             if (copyResult.FailedFiles > 0)
             {
                 throw new InvalidOperationException(
-                    $"复制失败：共有 {copyResult.FailedFiles} 个文件未复制。{copyResult.FirstError}");
+                    Localizer.Format("Vm.SoftwareMove.CopyFailed", "复制失败：共有 {0} 个文件未复制。{1}", copyResult.FailedFiles, copyResult.FirstError));
             }
 
-            StatusMessage = $"复制完成，共 {copyResult.CopiedFiles} 个文件，正在验证符号链接能力...";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.CopyCompleted", "复制完成，共 {0} 个文件，正在验证符号链接能力...", copyResult.CopiedFiles);
 
             // 先验证能否创建 Junction 链接（用临时路径测试），避免删除源目录后链接创建失败
-            StatusMessage = "正在验证符号链接能力...";
+            StatusMessage = Localizer.Get("Vm.SoftwareMove.VerifyingSymlink", "正在验证符号链接能力...");
             string tempJunction = sourcePath + "__slim_test__";
             bool testSuccess = await _symlinkService.CreateJunctionAsync(tempJunction, targetPath);
             if (testSuccess)
@@ -217,24 +217,24 @@ public partial class SoftwareMoveViewModel : ObservableObject
             else
             {
                 try { Directory.Delete(targetPath, recursive: true); } catch { }
-                StatusMessage = "创建符号链接失败，请确认管理员权限和目标路径权限";
+                StatusMessage = Localizer.Get("Vm.SoftwareMove.CreateLinkFailed", "创建符号链接失败，请确认管理员权限和目标路径权限");
                 return;
             }
 
             // 链接可创建，删除源目录，建立正式 Junction
-            StatusMessage = "正在删除原目录并创建正式链接...";
+            StatusMessage = Localizer.Get("Vm.SoftwareMove.CreatingFinalLink", "正在删除原目录并创建正式链接...");
             Directory.Delete(sourcePath, recursive: true);
             bool finalLinkCreated = await _symlinkService.CreateJunctionAsync(sourcePath, targetPath);
             if (!finalLinkCreated)
-                throw new InvalidOperationException("正式符号链接创建失败，已复制文件请手动检查");
+                throw new InvalidOperationException(Localizer.Get("Vm.SoftwareMove.CreateFinalLinkFailed", "正式符号链接创建失败，已复制文件请手动检查"));
 
             SelectedSoftware.MigratedToPath = targetPath;
             SelectedSoftware.CanMigrate = false;
-            StatusMessage = $"{SelectedSoftware.DisplayName} 已迁移到 {targetPath}";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.MigrateCompleted", "{0} 已迁移到 {1}", SelectedSoftware.DisplayName, targetPath);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"迁移失败：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.SoftwareMove.MigrateFailed", "迁移失败：{0}", ex.Message);
         }
         finally
         {
@@ -270,7 +270,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
                 catch (Exception ex)
                 {
                     failedFiles++;
-                    firstError ??= $"无法创建目录：{dst}，{ex.Message}";
+                    firstError ??= Localizer.Format("Vm.SoftwareMove.CreateDirFailed", "无法创建目录：{0}，{1}", dst, ex.Message);
                     continue;
                 }
 
@@ -282,7 +282,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
                 catch (Exception ex)
                 {
                     failedFiles++;
-                    firstError ??= $"无法读取目录：{src}，{ex.Message}";
+                    firstError ??= Localizer.Format("Vm.SoftwareMove.ReadDirFailed", "无法读取目录：{0}，{1}", src, ex.Message);
                     continue;
                 }
 
@@ -297,7 +297,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
                     catch (Exception ex)
                     {
                         failedFiles++;
-                        firstError ??= $"无法复制文件：{file.FullName}，{ex.Message}";
+                        firstError ??= Localizer.Format("Vm.SoftwareMove.CopyFileFailed", "无法复制文件：{0}，{1}", file.FullName, ex.Message);
                     }
                 }
 
@@ -309,7 +309,7 @@ public partial class SoftwareMoveViewModel : ObservableObject
                 catch (Exception ex)
                 {
                     failedFiles++;
-                    firstError ??= $"无法读取子目录：{src}，{ex.Message}";
+                    firstError ??= Localizer.Format("Vm.SoftwareMove.ReadSubDirFailed", "无法读取子目录：{0}，{1}", src, ex.Message);
                     continue;
                 }
 

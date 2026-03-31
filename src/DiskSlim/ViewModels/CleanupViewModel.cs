@@ -50,7 +50,7 @@ public partial class CleanupViewModel : ObservableObject
     private bool _isCleaning;
 
     [ObservableProperty]
-    private string _statusMessage = @"点击""扫描""查看可清理项目";
+    private string _statusMessage = Localizer.Get("Vm.Cleanup.ClickScan", "点击\"扫描\"查看可清理项目");
 
     [ObservableProperty]
     private double _cleanProgress;
@@ -72,7 +72,7 @@ public partial class CleanupViewModel : ObservableObject
         LoadCleanupItems();
 
         if (!AdminHelper.IsRunningAsAdmin())
-            StatusMessage = "当前为普通用户模式（部分项目需管理员权限）";
+            StatusMessage = Localizer.Get("Vm.Cleanup.NonAdminMode", "当前为普通用户模式（部分项目需管理员权限）");
     }
 
     /// <summary>
@@ -109,22 +109,22 @@ public partial class CleanupViewModel : ObservableObject
         if (IsScanning || IsCleaning) return;
 
         IsScanning = true;
-        StatusMessage = "正在扫描可清理空间...";
+        StatusMessage = Localizer.Get("Vm.Cleanup.Scanning", "正在扫描可清理空间...");
         _cts = new CancellationTokenSource();
 
         try
         {
             await _cleanupService.ScanEstimatedSizesAsync(CleanupItems, _cts.Token);
             UpdateTotalSelectedSize();
-            StatusMessage = $"扫描完成，共可释放 {TotalSelectedSizeText}";
+            StatusMessage = Localizer.Format("Vm.Cleanup.ScanCompleted", "扫描完成，共可释放 {0}", TotalSelectedSizeText);
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "扫描已取消";
+            StatusMessage = Localizer.Get("Vm.Cleanup.ScanCanceled", "扫描已取消");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"扫描出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Cleanup.ScanError", "扫描出错：{0}", ex.Message);
         }
         finally
         {
@@ -143,7 +143,7 @@ public partial class CleanupViewModel : ObservableObject
         var selectedItems = CleanupItems.Where(i => i.IsSelected).ToList();
         if (selectedItems.Count == 0)
         {
-            StatusMessage = "请先选择要清理的项目";
+            StatusMessage = Localizer.Get("Vm.Cleanup.SelectItemsFirst", "请先选择要清理的项目");
             return;
         }
 
@@ -162,13 +162,13 @@ public partial class CleanupViewModel : ObservableObject
 
                 if (action == AdminAction.Cancel)
                 {
-                    StatusMessage = "清理已取消";
+                    StatusMessage = Localizer.Get("Vm.Cleanup.Canceled", "清理已取消");
                     return;
                 }
 
                 if (action == AdminAction.RestartAsAdmin)
                 {
-                    StatusMessage = "正在请求管理员权限...";
+                    StatusMessage = Localizer.Get("Vm.Cleanup.RequestAdmin", "正在请求管理员权限...");
                     AdminHelper.RestartAsAdmin();
                     return;
                 }
@@ -180,7 +180,7 @@ public partial class CleanupViewModel : ObservableObject
 
         if (runnableItems.Count == 0)
         {
-            StatusMessage = "当前所选项目均需要管理员权限，请提权后重试";
+            StatusMessage = Localizer.Get("Vm.Cleanup.AllRequireAdmin", "当前所选项目均需要管理员权限，请提权后重试");
             return;
         }
 
@@ -193,14 +193,14 @@ public partial class CleanupViewModel : ObservableObject
             bool confirmed = await ShowConfirmationDialogAsync(cautionItems, dangerItems);
             if (!confirmed)
             {
-                StatusMessage = "清理已取消";
+                StatusMessage = Localizer.Get("Vm.Cleanup.Canceled", "清理已取消");
                 return;
             }
         }
 
         IsCleaning = true;
         CleanProgress = 0;
-        StatusMessage = "正在清理...";
+        StatusMessage = Localizer.Get("Vm.Cleanup.Cleaning", "正在清理...");
         _cts = new CancellationTokenSource();
 
         var report = new CleanupReport { StartedAt = DateTime.Now };
@@ -212,7 +212,7 @@ public partial class CleanupViewModel : ObservableObject
                 CurrentCleaningItem = p.CurrentItemName;
                 if (p.ItemsTotal > 0)
                     CleanProgress = (double)p.ItemsCompleted / p.ItemsTotal * 100.0;
-                StatusMessage = $"正在清理：{p.CurrentItemName}";
+                StatusMessage = Localizer.Format("Vm.Cleanup.CleaningItem", "正在清理：{0}", p.CurrentItemName);
             });
 
             // 逐项清理并记录明细
@@ -250,8 +250,8 @@ public partial class CleanupViewModel : ObservableObject
             TotalCleanedSizeText = FileSizeHelper.Format(totalFreed);
             CleanProgress = 100;
             StatusMessage = skippedByPermission > 0
-                ? $"清理完成！共释放 {TotalCleanedSizeText}，另有 {skippedByPermission} 项因权限不足未执行"
-                : $"清理完成！共释放 {TotalCleanedSizeText}";
+                ? Localizer.Format("Vm.Cleanup.CleanCompletedWithSkipped", "清理完成！共释放 {0}，另有 {1} 项因权限不足未执行", TotalCleanedSizeText, skippedByPermission)
+                : Localizer.Format("Vm.Cleanup.CleanCompleted", "清理完成！共释放 {0}", TotalCleanedSizeText);
 
             // 仅在至少清理了一项时保存报告
             if (report.Items.Count > 0)
@@ -264,11 +264,11 @@ public partial class CleanupViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "清理已取消";
+            StatusMessage = Localizer.Get("Vm.Cleanup.Canceled", "清理已取消");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"清理出错：{ex.Message}";
+            StatusMessage = Localizer.Format("Vm.Cleanup.CleanError", "清理出错：{0}", ex.Message);
         }
         finally
         {
@@ -297,6 +297,17 @@ public partial class CleanupViewModel : ObservableObject
     }
 
     /// <summary>
+    /// 全选非危险（🟢安全 + 🟡谨慎）级别的清理项
+    /// </summary>
+    [RelayCommand]
+    private void SelectNonDangerItems()
+    {
+        foreach (var item in CleanupItems)
+            item.IsSelected = item.Safety != SafetyLevel.Danger;
+        UpdateTotalSelectedSize();
+    }
+
+    /// <summary>
     /// 更新已选中项目的总大小统计
     /// </summary>
     private void UpdateTotalSelectedSize()
@@ -308,20 +319,20 @@ public partial class CleanupViewModel : ObservableObject
     private async Task<AdminAction> ShowAdminRequirementDialogAsync(List<CleanupItem> adminItems)
     {
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("以下项目需要管理员权限：");
+        sb.AppendLine(Localizer.Get("Vm.Cleanup.AdminDialog.ItemsNeedAdmin", "以下项目需要管理员权限："));
         sb.AppendLine();
         foreach (var item in adminItems)
             sb.AppendLine($"  • {item.Name}");
         sb.AppendLine();
-        sb.AppendLine("你可以选择仅清理当前可执行项目，或提权后重启应用继续。 ");
+        sb.AppendLine(Localizer.Get("Vm.Cleanup.AdminDialog.ChooseAction", "你可以选择仅清理当前可执行项目，或提权后重启应用继续。 "));
 
         var dialog = new ContentDialog
         {
-            Title = "需要管理员权限",
+            Title = Localizer.Get("Vm.Cleanup.AdminDialog.Title", "需要管理员权限"),
             Content = sb.ToString().Trim(),
-            PrimaryButtonText = "仅清理可执行项",
-            SecondaryButtonText = "提权后重启",
-            CloseButtonText = "取消",
+            PrimaryButtonText = Localizer.Get("Vm.Cleanup.AdminDialog.Primary", "仅清理可执行项"),
+            SecondaryButtonText = Localizer.Get("Vm.Cleanup.AdminDialog.Secondary", "提权后重启"),
+            CloseButtonText = Localizer.Get("Vm.Cleanup.AdminDialog.Close", "取消"),
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = XamlRoot
         };
@@ -343,12 +354,12 @@ public partial class CleanupViewModel : ObservableObject
         List<CleanupItem> dangerItems)
     {
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("您选中了以下需要注意的清理项目，请确认：");
+        sb.AppendLine(Localizer.Get("Vm.Cleanup.ConfirmDialog.Intro", "您选中了以下需要注意的清理项目，请确认："));
         sb.AppendLine();
 
         if (dangerItems.Count > 0)
         {
-            sb.AppendLine("🔴 危险项目（操作不可逆，请慎重）：");
+            sb.AppendLine(Localizer.Get("Vm.Cleanup.ConfirmDialog.Danger", "🔴 危险项目（操作不可逆，请慎重）："));
             foreach (var item in dangerItems)
                 sb.AppendLine($"  • {item.Name}");
             sb.AppendLine();
@@ -356,17 +367,17 @@ public partial class CleanupViewModel : ObservableObject
 
         if (cautionItems.Count > 0)
         {
-            sb.AppendLine("🟡 谨慎项目（建议确认后清理）：");
+            sb.AppendLine(Localizer.Get("Vm.Cleanup.ConfirmDialog.Caution", "🟡 谨慎项目（建议确认后清理）："));
             foreach (var item in cautionItems)
                 sb.AppendLine($"  • {item.Name}");
         }
 
         var dialog = new ContentDialog
         {
-            Title = "确认清理",
+            Title = Localizer.Get("Vm.Cleanup.ConfirmDialog.Title", "确认清理"),
             Content = sb.ToString().Trim(),
-            PrimaryButtonText = "确认清理",
-            CloseButtonText = "取消",
+            PrimaryButtonText = Localizer.Get("Vm.Cleanup.ConfirmDialog.Primary", "确认清理"),
+            CloseButtonText = Localizer.Get("Vm.Cleanup.ConfirmDialog.Close", "取消"),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = XamlRoot
         };

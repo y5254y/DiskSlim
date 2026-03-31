@@ -14,9 +14,9 @@
 
             <!-- 标题 -->
             <StackPanel>
-                <TextBlock Text="⚙️ 设置"
+                <TextBlock x:Uid="SettingsPageTitle" Text="⚙️ 设置"
                            Style="{StaticResource SubtitleTextBlockStyle}"/>
-                <TextBlock Text="配置定时扫描、通知阈值和其他选项"
+                <TextBlock x:Uid="SettingsPageSubtitle" Text="配置定时扫描、通知阈值和其他选项"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             </StackPanel>
@@ -27,17 +27,18 @@
                 <StackPanel Spacing="16">
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <FontIcon Glyph="&#xE916;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}"/>
-                        <TextBlock Text="定时自动扫描" Style="{StaticResource BodyStrongTextBlockStyle}"
+                        <TextBlock x:Uid="SettingsPageScheduleTitle" Text="定时自动扫描" Style="{StaticResource BodyStrongTextBlockStyle}"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="启用后将按设定计划自动扫描C盘并保存快照，让您随时了解磁盘空间变化趋势。"
+                    <TextBlock x:Uid="SettingsPageScheduleDescription" Text="启用后将按设定计划自动扫描C盘并保存快照，让您随时了解磁盘空间变化趋势。"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                TextWrapping="Wrap"/>
 
                     <!-- 开关 -->
                     <ToggleSwitch
+                        x:Uid="SettingsPageScheduleToggle"
                         Header="启用定时扫描"
                         IsOn="{x:Bind ViewModel.IsScheduleEnabled, Mode=TwoWay}"
                         OnContent="已启用" OffContent="已关闭"/>
@@ -51,7 +52,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="扫描频率：" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" x:Uid="SettingsPageScheduleFrequencyLabel" Text="扫描频率：" VerticalAlignment="Center"/>
                             <ComboBox Grid.Column="1"
                                       ItemsSource="{x:Bind ViewModel.ScheduleOptions}"
                                       SelectedItem="{x:Bind ViewModel.SelectedSchedule, Mode=TwoWay}"
@@ -66,14 +67,16 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="执行时间：" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" x:Uid="SettingsPageExecuteTimeLabel" Text="执行时间：" VerticalAlignment="Center"/>
                             <NumberBox Grid.Column="1" Width="80"
+                                       x:Uid="SettingsPageHourNumberBox"
                                        Header="时"
                                        Minimum="0" Maximum="23"
                                        Value="{x:Bind ViewModel.ScheduledHour, Mode=TwoWay}"
                                        SpinButtonPlacementMode="Inline"/>
                             <TextBlock Grid.Column="2" Text="：" VerticalAlignment="Bottom" Margin="4,0,4,8"/>
                             <NumberBox Grid.Column="3" Width="80"
+                                       x:Uid="SettingsPageMinuteNumberBox"
                                        Header="分"
                                        Minimum="0" Maximum="59"
                                        Value="{x:Bind ViewModel.ScheduledMinute, Mode=TwoWay}"
@@ -85,7 +88,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="下次运行：" VerticalAlignment="Center"
+                            <TextBlock Grid.Column="0" x:Uid="SettingsPageNextRunLabel" Text="下次运行：" VerticalAlignment="Center"
                                        Style="{StaticResource CaptionTextBlockStyle}"/>
                             <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.NextRunTimeText, Mode=OneWay}"
                                        VerticalAlignment="Center"
@@ -102,7 +105,7 @@
                             <ProgressRing Width="14" Height="14"
                                           IsActive="{x:Bind ViewModel.IsScheduleLoading, Mode=OneWay}"
                                           Visibility="{x:Bind ViewModel.IsScheduleLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Text="保存定时扫描设置"/>
+                            <TextBlock x:Uid="SettingsPageSaveScheduleText" Text="保存定时扫描设置"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -114,16 +117,17 @@
                 <StackPanel Spacing="16">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xEA8F;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}"/>
-                        <TextBlock Text="空间不足通知" Style="{StaticResource BodyStrongTextBlockStyle}"
+                        <TextBlock x:Uid="SettingsPageNotificationTitle" Text="空间不足通知" Style="{StaticResource BodyStrongTextBlockStyle}"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="当C盘可用空间低于设定阈值时，将自动弹出 Windows 通知提醒您进行清理。"
+                    <TextBlock x:Uid="SettingsPageNotificationDescription" Text="当C盘可用空间低于设定阈值时，将自动弹出 Windows 通知提醒您进行清理。"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                TextWrapping="Wrap"/>
 
                     <ToggleSwitch
+                        x:Uid="SettingsPageNotificationToggle"
                         Header="启用空间不足通知"
                         IsOn="{x:Bind ViewModel.IsNotificationEnabled, Mode=TwoWay}"
                         OnContent="已启用" OffContent="已关闭"/>
@@ -135,7 +139,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="警告阈值：" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" x:Uid="SettingsPageThresholdLabel" Text="警告阈值：" VerticalAlignment="Center"/>
                             <ComboBox Grid.Column="1"
                                       ItemsSource="{x:Bind ViewModel.ThresholdOptions}"
                                       SelectedItem="{x:Bind ViewModel.SelectedThreshold, Mode=TwoWay}"
@@ -147,9 +151,42 @@
                     <Button Command="{x:Bind ViewModel.SendTestNotificationCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xEA8F;" FontSize="14"/>
-                            <TextBlock Text="发送测试通知"/>
+                            <TextBlock x:Uid="SettingsPageSendTestNotificationText" Text="发送测试通知"/>
                         </StackPanel>
                     </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- 联系与交流 -->
+            <Border CornerRadius="8" Padding="20,16"
+         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE715;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}"/>
+                        <TextBlock x:Uid="SettingsPageContactTitle" Text="联系与交流" Style="{StaticResource BodyStrongTextBlockStyle}"
+                        VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock x:Uid="SettingsPageWechatLabel" Text="公众号（扫码关注）"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+                    <Border CornerRadius="8" Padding="8"
+                 Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                 HorizontalAlignment="Left">
+                        <Image Source="ms-appx:///Assets/code.jpg"
+                    Width="180"
+                    Height="180"
+                    Stretch="UniformToFill"/>
+                    </Border>
+
+                    <TextBlock x:Uid="SettingsPageQqGroupLabel" Text="用户交流QQ群"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <HyperlinkButton x:Uid="SettingsPageQqLink"
+                          Content="点击链接加入群聊【软件使用交流群】"
+                          NavigateUri="https://qm.qq.com/q/sIt8RliSHu"
+                          HorizontalAlignment="Left"/>
                 </StackPanel>
             </Border>
 
@@ -159,17 +196,54 @@
                 <StackPanel Spacing="8">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE946;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}"/>
-                        <TextBlock Text="关于 DiskSlim" Style="{StaticResource BodyStrongTextBlockStyle}"
+                        <TextBlock x:Uid="SettingsPageAboutTitle" Text="关于 DiskSlim" Style="{StaticResource BodyStrongTextBlockStyle}"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Text="DiskSlim - C盘瘦身大师" Style="{StaticResource BodyTextBlockStyle}"/>
-                    <TextBlock Text="版本：Phase 3 Pro 版（.NET 10 + WinUI 3）"
+                    <TextBlock x:Uid="SettingsPageAppName" Text="DiskSlim - C盘瘦身大师" Style="{StaticResource BodyTextBlockStyle}"/>
+                    <TextBlock x:Uid="SettingsPageVersion" Text="版本：1.0.0"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <TextBlock Text="帮助您轻松管理和优化C盘空间，让电脑保持最佳状态。"
+                    <TextBlock x:Uid="SettingsPageAboutDescription" Text="帮助您轻松管理和优化C盘空间，让电脑保持最佳状态。"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                TextWrapping="Wrap"/>
+
+                </StackPanel>
+            </Border>
+
+            <!-- 语言设置 -->
+            <Border CornerRadius="8" Padding="20,16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                <StackPanel Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE909;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}"/>
+                        <TextBlock x:Uid="SettingsPageLanguageTitle" Text="界面语言" Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock x:Uid="SettingsPageLanguageDescription" Text="可选择跟随系统或固定语言，保存后下次启动自动生效。"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"/>
+
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox Grid.Column="0"
+                                  ItemsSource="{x:Bind ViewModel.LanguageOptions}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
+                                  DisplayMemberPath="DisplayName"
+                                  HorizontalAlignment="Stretch"/>
+
+                        <Button Grid.Column="1"
+                                Command="{x:Bind ViewModel.SaveLanguageCommand}"
+                                Style="{StaticResource AccentButtonStyle}">
+                            <TextBlock x:Uid="SettingsPageSaveLanguageText" Text="保存语言"/>
+                        </Button>
+                    </Grid>
                 </StackPanel>
             </Border>
 
@@ -183,3 +257,4 @@
         </StackPanel>
     </ScrollViewer>
 </Page>
+

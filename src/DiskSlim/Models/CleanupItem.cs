@@ -8,6 +8,9 @@ namespace DiskSlim.Models;
 /// </summary>
 public partial class CleanupItem : ObservableObject
 {
+    /// <summary>内部标识键（用于逻辑分支，不受多语言影响）</summary>
+    public string Key { get; set; } = string.Empty;
+
     /// <summary>清理项名称（如"系统临时文件"）</summary>
     public string Name { get; set; } = string.Empty;
 
@@ -41,9 +44,9 @@ public partial class CleanupItem : ObservableObject
     /// </summary>
     public string SafetyBadge => Safety switch
     {
-        SafetyLevel.Safe => "🟢 安全",
-        SafetyLevel.Caution => "🟡 谨慎",
-        SafetyLevel.Danger => "🔴 危险",
+        SafetyLevel.Safe => Localizer.Get("Model.CleanupItem.Safety.Safe", "🟢 安全"),
+        SafetyLevel.Caution => Localizer.Get("Model.CleanupItem.Safety.Caution", "🟡 谨慎"),
+        SafetyLevel.Danger => Localizer.Get("Model.CleanupItem.Safety.Danger", "🔴 危险"),
         _ => string.Empty
     };
 
