@@ -96,7 +96,10 @@ public class DuplicateScanService : IDuplicateScanService
                             });
                         }
                     }
-                    catch { }
+                    catch
+                    {
+                        // 跳过无法访问的文件（权限不足、路径过长等），继续枚举其他文件
+                    }
                 }
             }
 
@@ -141,7 +144,11 @@ public class DuplicateScanService : IDuplicateScanService
                             TotalCount = totalToHash
                         });
                     }
-                    catch { }
+                    catch
+                    {
+                        // 跳过无法读取（被锁定、已删除）的文件，继续处理其他文件
+                        hashComputed++;
+                    }
                 }
 
                 // 只保留真正有重复（2+ 文件）的哈希组
@@ -206,7 +213,10 @@ public class DuplicateScanService : IDuplicateScanService
                     MoveToRecycleBin(path);
                     count++;
                 }
-                catch { }
+                catch
+                {
+                    // 跳过无法移动到回收站的文件（权限不足、文件已被删除等），继续处理其他文件
+                }
             }
             return count;
         });
